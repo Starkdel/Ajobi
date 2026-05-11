@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
+Route::post('/login', [AuthController::class, 'login'] )->name('login');
 Route::get('/auth/google/redirect', [AuthController::class, 'redirect'])->name('auth.google.redirect');
 
 // Route to handle the callback from Google
