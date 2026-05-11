@@ -66,7 +66,29 @@ return response()->json([
 }
 
 
+public function verifyAccount($token)
+{
+    $user = DB::table('users')
+        ->where('verify_token', $token)
+        ->first();
 
+    if (!$user) {
+        return response()->json([
+            'status' => 'fail',
+            'message' => 'Invalid or expired token.'
+        ]);
+    }
+
+    DB::table('users')
+        ->where('id', $user->id)
+        ->update([
+            'verification' => true,
+            'verify_token' => null,
+            'updated_at' => now()
+        ]);
+
+    return redirect('/dashboard');
+}
 
 public function register(Request $request){
 
