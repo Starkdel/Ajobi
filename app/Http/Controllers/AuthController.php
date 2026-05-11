@@ -16,7 +16,54 @@ use Laravel\Socialite\Facades\Socialite;
 class AuthController extends Controller
 {
     //
+    public function login(Request $request){
+        
+         
+     $validator = Validator::make($request->all(), [
 
+        'email' => 'required|email',
+     
+        'password' => 'required',
+      
+        
+    ]);  
+       
+    if ($validator->fails()) {
+                return response()->json([
+                    'message' => $validator->errors()->first(),
+                    'status' => 'fail'
+                ]);
+    }else{
+$password = $request ->password;
+$email = $request -> email;
+ $checkemail = DB::table('users')->where(['email' => $email,'verification' => 'true'])-> count();
+ if($checkemail == 1){
+    $userdata= DB::table('users')->where(['email' => $email,'verification' => 'true'])->first();
+    $existingpassword = $userdata -> password;
+
+    if(md5($password) == $existingpassword){
+        return response()->json([
+            'message' => "User LoggedIn",
+            'status' => 'success'
+        ]);
+
+    }else{
+        return response()->json([
+            'message' => "invalid password",
+            'status' => 'fail'
+        ]);
+    }
+
+ }else{
+    return response()->json([
+        'message' => 'This email does not exist',
+        'status' => 'fail'
+    ]);
+ }
+
+
+    }
+    }
     public function redirect()
     {
         return Socialite::driver('google')->stateless()->redirect();
