@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 */
 
 Route::get('/test-mail', function () {
-    Mail::raw('Hello from Gmail SMTP!', function ($message) {
+    Mail::raw('Hello from Gmail data SMTP!', function ($message) {
         $message->to('soyombotomiwa0502@gmail.com')
                 ->subject('SMTP Test Email');
     });
