@@ -19,6 +19,7 @@ Route::get('/test-mail', function () {
     Mail::raw('Hello from Gmail data SMTP!', function ($message) {
         $message->to('soyombotomiwa0502@gmail.com')
                 ->subject('SMTP Test Email');
+        
     });
 
     return "Email sent!";
