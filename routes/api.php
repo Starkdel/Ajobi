@@ -18,7 +18,7 @@ use App\Http\Controllers\AuthController;
 */
 Route::get('/test', function () {
     return response()->json([
-        'message' => 'Cloud Run updated successfully'
+      return config('app.key');
     ]);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
