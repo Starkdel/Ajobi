@@ -43,15 +43,15 @@ $existingpassword = $userdata -> password;
 
 if(md5($password) == $existingpassword){
 return response()->json([
-    'success' => true,
-    'data' => [
-        'user_id' => $userdata->user_id, 
-        'full_name' => $userdata->full_name,
-        'token' => $userdata -> verify_token, 
-        'ajo_score' => $userdata->ajo_score,
-        'score_tier' => $userdata->score_tier,
-        'onboarding_complete' => $userdata -> onboarding_complete
-    ]
+'success' => true,
+'data' => [
+'user_id' => $userdata->user_id, 
+'full_name' => $userdata->full_name,
+'token' => $userdata -> verify_token, 
+'ajo_score' => $userdata->ajo_score,
+'score_tier' => $userdata->score_tier,
+'onboarding_complete' => $userdata -> onboarding_complete
+]
 ]);
 }else{
 return response()->json([
@@ -74,25 +74,25 @@ return response()->json([
 
 public function verifyAccount($token)
 {
-    $user = DB::table('users')
-        ->where(['verify_token' => $token])
-        ->first();
+$user = DB::table('users')
+->where(['verify_token' => $token])
+->first();
 
-    if (!$user) {
-        return response()->json([
-            'status' => 'fail',
-            'message' => 'Invalid or expired token.'
-        ]);
-    }
+if (!$user) {
+return response()->json([
+'status' => 'fail',
+'message' => 'Invalid or expired token.'
+]);
+}
 
-    DB::table('users')
-        ->where(['verify_token' => $token])
-        ->update([
-            'verification' => 'true',
+DB::table('users')
+->where(['verify_token' => $token])
+->update([
+'verification' => 'true',
 
-        ]);
+]);
 
-    return redirect('/dashboard');
+return redirect('/dashboard');
 }
 
 public function register(Request $request){
@@ -126,39 +126,39 @@ return response()->json([
 'status' => 'fail'
 ]);
 }
- $token = Str::random(64);
+$token = Str::random(64);
 $userid = uniqid('user', true);
-    DB::table('users')->insert([
-        'full_name' => $request->full_name,
-        'phone' => $request->phone,
-        'email' => $request->email,
-        'password' => md5($request->password),
-        'verification' => 'false',
-        'verify_token' => $token,
-        'Date' => now(),
-        'user_id' => $userid,
-        'email_verified_at' => now(),                      
-        'onboarding_complete' => 'false'                   
-                               
-    ]);
+DB::table('users')->insert([
+'full_name' => $request->full_name,
+'phone' => $request->phone,
+'email' => $request->email,
+'password' => md5($request->password),
+'verification' => 'false',
+'verify_token' => $token,
+'Date' => now(),
+'user_id' => $userid,
+'email_verified_at' => now(),                      
+'onboarding_complete' => 'false'                   
+   
+]);
 
-    $verification_link = url('/verify-account/' . $token);
+$verification_link = url('/verify-account/' . $token);
 
-    $user_d = [
-        'name' => $request->full_name,
-        'title' => 'Account Verification',
-        'sender_email' => 'soyombotomiwa@gmail.com',
-        'email' => $request->email,
-        'app_name' => 'AjoBI',
-        'verification_link' => $verification_link
-    ];
+$user_d = [
+'name' => $request->full_name,
+'title' => 'Account Verification',
+'sender_email' => 'soyombotomiwa@gmail.com',
+'email' => $request->email,
+'app_name' => 'AjoBI',
+'verification_link' => $verification_link
+];
 
-    MailController::send_mail($user_d, 'link');
+MailController::send_mail($user_d, 'link');
 
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Verification email sent.'
-    ]);
+return response()->json([
+'status' => 'success',
+'message' => 'Verification email sent.'
+]);
 
 }
 }
@@ -202,6 +202,47 @@ return response()->json([
 
 
 }
+public function onboardingstep1(Request $request){
+$validator = Validator::make($request->all(), [
+'occupation' => 'required',
+'email'  => 'required|email',                           
+]);  
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'fail'
+]);
+}else{
+$occupation = $request -> occupation;
+$email = $request -> email;
+$data = DB::table('users')
+->where(['email' => $email])
+->update([
+'occupation' => $occupation,
+
+]);
+if($data){
+return response()->json([
+"success" => true,
+"data" => [
+"step_completed"=> "1",
+"next_step"=> "2"
+
+]
+
+            
+]);
+
+}else{
+
+}
 
 
+}
+
+}
+//stop
+
+    
 }
