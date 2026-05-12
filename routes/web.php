@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\AuthController;
 
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +16,14 @@ use App\Http\Controllers\AuthController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/storage-link', function () {
+
+    Artisan::call('storage:link');
+
+    return 'Storage linked successfully';
+
+});
 
 Route::get('/test-mail', function () {
     Mail::raw('Hello from Gmail data SMTP!', function ($message) {
