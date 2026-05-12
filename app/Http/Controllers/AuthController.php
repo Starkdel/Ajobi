@@ -92,7 +92,7 @@ DB::table('users')
 
 ]);
 
-return redirect('/dashboard');
+return redirect('https://ajobi.onrender.com/setup');
 }
 
 public function register(Request $request){
