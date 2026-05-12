@@ -332,13 +332,14 @@ $contribution_consistency = $request -> contribution_consistency;
 $in_ajo_group = $request -> in_ajo_group;
 $saves_money = $request -> saves_money;
 $email = $request -> email;
+$information = $validator->validated();  
 $data = DB::table('users')
 ->where(['email' => $email])
 ->update([
 'contribution_consistency' => $contribution_consistency,
 'in_ajo_group' => $in_ajo_group,
 'saves_money' => $saves_money,
-'savings_methods' => $validator['savings_methods'],
+'savings_methods' => $information['savings_methods'],
 ]);
 if($data){
 return response()->json([
