@@ -19,7 +19,10 @@ return [
 
     'allowed_methods' => ['POST', 'GET'],
 
-    'allowed_origins' => ['http://localhost:5173'],
+    'allowed_origins' =>  [
+    'https://ajobi.onrender.com',
+    'https://www.ajobi.onrender.com',
+],
 
     'allowed_origins_patterns' => [],
 
