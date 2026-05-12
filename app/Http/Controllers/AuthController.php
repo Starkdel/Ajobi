@@ -136,7 +136,7 @@ $userid = uniqid('user', true);
                                
     ]);
 
-    $verification_link = url('/verify-account/' . $token);
+    $verification_link = url('/api/verify-account/' . $token);
 
     $user_d = [
         'name' => $request->full_name,
