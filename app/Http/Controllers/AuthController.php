@@ -139,7 +139,7 @@ DB::table('users')->insert([
 'user_id' => $userid,
 'email_verified_at' => now(),                      
 'onboarding_complete' => 'false'                   
-   
+
 ]);
 
 $verification_link = url('/verify-account/' . $token);
@@ -231,18 +231,201 @@ return response()->json([
 
 ]
 
-            
+
 ]);
 
 }else{
+return response()->json([
+"success" => false,
+"data" => [
+"step_completed"=> "null",
+"next_step"=> "1"
 
+]
+
+
+]);
 }
 
 
 }
 
 }
+
+
+public function onboardingstep2(Request $request){
+$validator = Validator::make($request->all(), [
+'trade_duration' => 'required',
+'state' => 'required',
+'lga' => 'required',
+'income_range' => 'required',
+'email'  => 'required|email',                           
+]);  
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'fail'
+]);
+}else{
+$income_range = $request -> income_range;
+$lga = $request -> lga;
+$state = $request -> state;
+$trade_duration = $request -> trade_duration;
+
+$email = $request -> email;
+$data = DB::table('users')
+->where(['email' => $email])
+->update([
+'income_range' => $income_range,
+'lga' => $lga,
+'state' => $state,
+'trade_duration' => $trade_duration,
+]);
+if($data){
+return response()->json([
+"success" => true,
+"data" => [
+"step_completed"=> "2",
+"next_step"=> "3"
+
+]
+
+
+]);
+
+}else{
+return response()->json([
+"success" => false,
+"data" => [
+"step_completed"=> "1",
+"next_step"=> "2"
+
+]
+
+
+]);
+}
+
+
+}
+
+}
+
+public function onboardingstep3(Request $request){
+$validator = Validator::make($request->all(), [
+'saves_money' => 'required|boolean',
+'savings_methods' => 'required|array',
+'savings_methods.*' => 'string',
+'in_ajo_group' => 'required|boolean',
+'contribution_consistency' => 'required',
+'email'  => 'required|email',                           
+]);  
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'fail'
+]);
+}else{
+$contribution_consistency = $request -> contribution_consistency;
+$in_ajo_group = $request -> in_ajo_group;
+$saves_money = $request -> saves_money;
+$email = $request -> email;
+$data = DB::table('users')
+->where(['email' => $email])
+->update([
+'contribution_consistency' => $contribution_consistency,
+'in_ajo_group' => $in_ajo_group,
+'saves_money' => $saves_money,
+'savings_methods' => $validated['savings_methods'],
+]);
+if($data){
+return response()->json([
+"success" => true,
+"data" => [
+"step_completed"=> "3",
+"next_step"=> "4"
+
+]
+
+
+]);
+
+}else{
+return response()->json([
+"success" => false,
+"data" => [
+"step_completed"=> "2",
+"next_step"=> "3"
+
+]
+
+
+]);
+}
+
+
+}
+
+}
+
+ 
+public function onboardingstep4(Request $request){
+$validator = Validator::make($request->all(), [
+'repaid_on_time' => 'required|boolean',
+'repaid_fully' => 'required|boolean',
+'has_borrowed' => 'required|boolean',
+'email'  => 'required|email',                           
+]);  
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'fail'
+]);
+}else{
+$repaid_on_time = $request -> repaid_on_time;
+$repaid_fully = $request -> repaid_fully;
+$has_borrowed = $request -> has_borrowed;
+$email = $request -> email;
+$data = DB::table('users')
+->where(['email' => $email])
+->update([
+'repaid_on_time' => $repaid_on_time,
+'repaid_fully' => $repaid_fully,
+'has_borrowed' => $has_borrowed
+]);
+if($data){
+return response()->json([
+"success" => true,
+"data" => [
+"step_completed"=> "4",
+"next_step"=> "5"
+
+]
+
+
+]);
+
+}else{
+return response()->json([
+"success" => false,
+"data" => [
+"step_completed"=> "3",
+"next_step"=> "4"
+
+]
+
+
+]);
+}
+
+
+}
+
+}   
 //stop
 
-    
+
 }
