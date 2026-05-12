@@ -25,6 +25,7 @@ Route::get('/storage-link', function () {
 
 });
 
+
 Route::get('/test-mail', function () {
     Mail::raw('Hello from Gmail data SMTP!', function ($message) {
         $message->to('soyombotomiwa0502@gmail.com')
