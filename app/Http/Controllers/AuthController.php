@@ -338,7 +338,7 @@ $data = DB::table('users')
 'contribution_consistency' => $contribution_consistency,
 'in_ajo_group' => $in_ajo_group,
 'saves_money' => $saves_money,
-'savings_methods' => $validated['savings_methods'],
+'savings_methods' => $validator['savings_methods'],
 ]);
 if($data){
 return response()->json([
