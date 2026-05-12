@@ -16,7 +16,7 @@ use App\Http\Controllers\AuthController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::get('/users', function () {
+Route::get('/userdata', function () {
 
     $users = DB::table('users')->get();
 
