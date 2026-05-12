@@ -143,7 +143,7 @@ $userid = uniqid('user', true);
         'title' => 'Account Verification',
         'sender_email' => 'soyombotomiwa@gmail.com',
         'email' => $request->email,
-        'app_name' => 'ReportWeaveAI.com',
+        'app_name' => 'AjoBI',
         'verification_link' => $verification_link
     ];
 
