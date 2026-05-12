@@ -17,13 +17,7 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Route::get('/storage-link', function () {
 
-    Artisan::call('storage:link');
-
-    return 'Storage linked successfully';
-
-});
 
 
 Route::get('/test-mail', function () {
