@@ -17,10 +17,23 @@ class Ajoscorecontroller extends Controller
 public function calculateAjoScore(Request $request)
 {
 
+
 $validator = Validator::make($request->all(), [
 
 'email' => 'required|email',
-]);  
+"language" => "required",
+
+'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+
+], [
+
+'profile_photo.image' => 'File must be an image',
+
+'profile_photo.mimes' => 'Images must be jpeg, png, or jpg',
+
+'profile_photo.max' => 'Image size should be less than 5MB',
+
+]);
 
 if ($validator->fails()) {
 return response()->json([
@@ -45,6 +58,28 @@ return response()->json([
 'success' => false,
 'message' => 'User not found'
 ]);
+}
+
+//upload image
+$imageUrl = null;
+if ($request->hasFile('profile_photo')) {
+
+$file = $request->file('profile_photo');
+
+$filename = time().'_'.$file->getClientOriginalName();
+
+$path = $file->storeAs('public/images', $filename);
+
+$imagePath = 'storage/images/'.$filename;
+
+DB::table('users')
+->where('email', $email)
+->update([
+'profile_photo' => $imagePath,
+'language' => $request -> language
+]);
+
+$imageUrl = asset($imagePath);
 }
 
 // svaings contribution
@@ -170,6 +205,7 @@ return response()->json([
 "ajo_score" => $finalScore,
 
 "score_tier" => $tier,
+"profile_image" => $imageUrl,
 
 "breakdown" => [
 
