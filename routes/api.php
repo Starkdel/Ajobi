@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\Ajoscorecontroller;
 
 
 /*
@@ -38,6 +38,7 @@ Route::post('/onboarding/step1', [AuthController::class, 'onboardingstep1'] )->n
 Route::post('/onboarding/step2', [AuthController::class, 'onboardingstep2'] )->name('onboardingstep2');
 Route::post('/onboarding/step3', [AuthController::class, 'onboardingstep3'] )->name('onboardingstep3');
 Route::post('/onboarding/step4', [AuthController::class, 'onboardingstep4'] )->name('onboardingstep4');
+Route::post('/onboarding/step5', [Ajoscorecontroller::class, 'calculateAjoScore'] )->name('calculateAjoScore');
 
 
 Route::get('/auth/google/redirect', [AuthController::class, 'redirect'])->name('auth.google.redirect');
