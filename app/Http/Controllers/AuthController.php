@@ -43,10 +43,16 @@ $existingpassword = $userdata -> password;
 
 if(md5($password) == $existingpassword){
 return response()->json([
-'message' => "User LoggedIn",
-'status' => 'success'
+    'success' => true,
+    'data' => [
+        'user_id' => $userdata->user_id, 
+        'full_name' => $userdata->full_name,
+        'token' => $userdata -> verify_token, 
+        'ajo_score' => $userdata->ajo_score,
+        'score_tier' => $userdata->score_tier,
+        'onboarding_complete' => $userdata -> onboarding_complete
+    ]
 ]);
-
 }else{
 return response()->json([
 'message' => "invalid password",
