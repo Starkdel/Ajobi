@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\MailController;
 use Nette\Utils\Random;
 
-class AuthController extends Controller
+class Ajoscorecontroller extends Controller
 {
 public function calculateAjoScore(Request $request)
 {
