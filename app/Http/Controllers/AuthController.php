@@ -83,8 +83,7 @@ public function verifyAccount($token)
         ->where('id', $user->id)
         ->update([
             'verification' => true,
-            'verify_token' => null,
-            'updated_at' => now()
+
         ]);
 
     return redirect('/dashboard');
@@ -139,7 +138,7 @@ $userid = uniqid('user', true);
     $verification_link = url('/verify-account/' . $token);
 
     $user_d = [
-        'name' => $request->name,
+        'name' => $request->full_name,
         'title' => 'Account Verification',
         'sender_email' => 'soyombotomiwa@gmail.com',
         'email' => $request->email,
