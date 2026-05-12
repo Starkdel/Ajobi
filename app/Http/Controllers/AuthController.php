@@ -69,7 +69,7 @@ return response()->json([
 public function verifyAccount($token)
 {
     $user = DB::table('users')
-        ->where('verify_token', $token)
+        ->where(['verify_token' => $token])
         ->first();
 
     if (!$user) {
@@ -80,9 +80,9 @@ public function verifyAccount($token)
     }
 
     DB::table('users')
-        ->where('id', $user->id)
+        ->where(['verify_token' => $token])
         ->update([
-            'verification' => true,
+            'verification' => 'true',
 
         ]);
 
@@ -127,10 +127,11 @@ $userid = uniqid('user', true);
         'phone' => $request->phone,
         'email' => $request->email,
         'password' => md5($request->password),
-        'verification' => false,
+        'verification' => 'false',
         'verify_token' => $token,
         'Date' => now(),
         'user_id' => $userid,
+        'email_verified_at' => now(),                      
         'onboarding_complete' => 'false'                   
                                
     ]);
