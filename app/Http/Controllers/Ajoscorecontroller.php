@@ -192,6 +192,21 @@ DB::table('users')
 'ajo_score' => $finalScore,
 'score_tier' => $tier
 ]);
+DB::table('ajoscorecalculation')->insert([
+'email' => $email,
+"savings_consistency" => $savings_score,
+
+"repayment_behaviour" => $repayment_score,
+
+"escrow_completion" => $escrow_completion,
+
+"transaction_history" => $transaction_history,
+
+"account_maturity" => $account_maturity,
+
+"community_standing" => $community_standing,
+"Date" => now()
+]);
 
 
 return response()->json([
