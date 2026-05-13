@@ -78,6 +78,7 @@ return response()->json([
 'error' => [
 'code' => 'UNAUTHORIZED',
 'message'=> 'Token is invalid'
+    ]
 ]);
 
 }
@@ -182,6 +183,7 @@ return response()->json([
 'error' => [
 'code' => 'UNAUTHORIZED',
 'message'=> 'Token is invalid'
+]
 ]);
 
 }
