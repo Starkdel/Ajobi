@@ -343,7 +343,7 @@ return response()->json([
 "tier" => [
 "name" => $tier,
 "color" => $colorcode,
-"next" => $nect,
+"next" => $next,
 "points_to_next" => $nexttierpoint
 ],
 
