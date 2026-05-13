@@ -506,7 +506,7 @@ return response()->json([
     
 } 
 
-public function onboardingcheck(Request $request){
+public function onboardingcheck($email){
  $d_token = $request->header('Authorization');
 $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
 if(env('REV_APP_KEY') == $accessTokennewinfo){ 
@@ -514,13 +514,7 @@ $validator = Validator::make($request->all(), [
 'email'  => 'required|email',                           
 ]);  
 
-if ($validator->fails()) {
-return response()->json([
-'message' => $validator->errors()->first(),
-'status' => 'fail'
-]);
-}else{
-    $email = $request -> email;
+
 $data = DB::table('users')
 ->where(['email' => $email])
 ->first();
@@ -595,7 +589,7 @@ return response()->json([
 ]);
 }
     
-}
+
     
 }else{
 return response()->json([
