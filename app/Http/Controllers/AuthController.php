@@ -537,9 +537,9 @@ if($occupation == NULL){
 return response()->json([
  "success"=> true,
   "data" => [
-    "steps_completed": "NONE",
-    "current_step": 1,
-    "onboarding_complete": false
+    "steps_completed"=> "NONE",
+    "current_step"=> 1,
+    "onboarding_complete"=> false
   ]
 
 ]);
@@ -547,9 +547,9 @@ return response()->json([
 return response()->json([
  "success"=> true,
   "data" => [
-    "steps_completed": [1],
-    "current_step": 2,
-    "onboarding_complete": false
+    "steps_completed"=> [1],
+    "current_step"=> 2,
+    "onboarding_complete"=> false
   ]
 
 ]);
@@ -557,9 +557,9 @@ return response()->json([
 return response()->json([
  "success"=> true,
   "data" => [
-    "steps_completed": [1,2],
-    "current_step": 3,
-    "onboarding_complete": false
+    "steps_completed"=> [1,2],
+    "current_step"=> 3,
+    "onboarding_complete"=> false
   ]
 
 ]);
@@ -567,9 +567,9 @@ return response()->json([
 return response()->json([
  "success"=> true,
   "data" => [
-    "steps_completed": [1,2,3],
-    "current_step": 4,
-    "onboarding_complete": false
+    "steps_completed"=> [1,2,3],
+    "current_step"=> 4,
+    "onboarding_complete"=> false
   ]
 
 ]);
@@ -577,9 +577,9 @@ return response()->json([
 return response()->json([
  "success"=> true,
   "data" => [
-    "steps_completed": [1,2,3,4],
-    "current_step": 5,
-    "onboarding_complete": false
+    "steps_completed"=> [1,2,3,4],
+    "current_step"=> 5,
+    "onboarding_complete"=> false
   ]
 
 ]);
@@ -587,9 +587,9 @@ return response()->json([
 return response()->json([
  "success"=> true,
   "data" => [
-    "steps_completed": [1,2,3,4,5],
-    "current_step": "completed",
-    "onboarding_complete": true
+    "steps_completed"=> [1,2,3,4,5],
+    "current_step"=> "completed",
+    "onboarding_complete"=> true
   ]
 
 ]);
