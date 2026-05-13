@@ -40,6 +40,8 @@ Route::post('/onboarding/step3', [AuthController::class, 'onboardingstep3'] )->n
 Route::post('/onboarding/step4', [AuthController::class, 'onboardingstep4'] )->name('onboardingstep4');
 Route::post('/onboarding/step5', [Ajoscorecontroller::class, 'calculateAjoScore'] )->name('calculateAjoScore');
 Route::post('/score/{userId}', [Ajoscorecontroller::class, 'getAjoreScore'] )->name('getAjoreScore');
+Route::post('/bank-statement/upload', [BankStatementController::class, 'upload']);
+Route::get('/bank-statement/status',  [BankStatementController::class, 'status']);
 
 
 Route::get('/auth/google/redirect', [AuthController::class, 'redirect'])->name('auth.google.redirect');
