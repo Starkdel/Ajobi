@@ -29,7 +29,7 @@ return [
 
     'allowed_headers' => ['Content-Type', 'X-Requested-With', 'x-xsrf-token'],
 
-    'exposed_headers' => ['X-XSRF-TOKEN'],
+    'exposed_headers' => ['X-XSRF-TOKEN',  'x-xsrf-token'],
 
     'max_age' => 0,
 
