@@ -19,7 +19,20 @@ use Illuminate\Support\Facades\Artisan;
 
 
 
+Route::get('/debug/sanctum-check', function () {
+    $found = false;
 
+    foreach (Route::getRoutes() as $route) {
+        if ($route->uri() === 'sanctum/csrf-cookie') {
+            $found = true;
+            break;
+        }
+    }
+
+    return response()->json([
+        'sanctum_csrf_cookie_registered' => $found,
+    ]);
+});
 Route::get('/test-mail', function () {
     Mail::raw('Hello from Gmail data SMTP!', function ($message) {
         $message->to('soyombotomiwa0502@gmail.com')
