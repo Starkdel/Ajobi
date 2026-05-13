@@ -8,6 +8,9 @@ RUN docker-php-ext-install pdo pdo_mysql
 # Enable Apache rewrite
 RUN a2enmod rewrite
 
+# 🔥 IMPORTANT: allow .htaccess overrides (FIX)
+RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+
 # Cloud Run requires port 8080
 RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
 
@@ -20,15 +23,24 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN composer install --no-dev --optimize-autoloader
 
-# Apache virtual host for Laravel
-RUN echo '<VirtualHost *:8080>\n\
-    DocumentRoot /var/www/html/public\n\
-    <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
-        Require all granted\n\
-        Options Indexes FollowSymLinks\n\
-        DirectoryIndex index.php\n\
-    </Directory>\n\
+# Apache virtual host for Laravel (FIXED)
+RUN echo '<VirtualHost *:8080>
+    DocumentRoot /var/www/html/public
+
+    <Directory /var/www/html/public>
+        AllowOverride All
+        Require all granted
+        Options Indexes FollowSymLinks
+        DirectoryIndex index.php
+    </Directory>
+
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
 # Permissions
