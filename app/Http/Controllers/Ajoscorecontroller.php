@@ -17,7 +17,9 @@ class Ajoscorecontroller extends Controller
 public function calculateAjoScore(Request $request)
 {
 
-
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
 $validator = Validator::make($request->all(), [
 
 'email' => 'required|email',
@@ -252,6 +254,16 @@ return response()->json([
 
 ]
 
+]);
+
+}
+    }else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+    ]
 ]);
 
 }
