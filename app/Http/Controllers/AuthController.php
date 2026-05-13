@@ -124,7 +124,7 @@ $validator = Validator::make($request->all(), [
 if ($validator->fails()) {
 return response()->json([
 'message' => $validator->errors()->first(),
-'status' => 'fail'
+'status' => 'error'
 ]);
 }else{
 
@@ -138,7 +138,7 @@ $checkemail = DB::table('users')->where(['email' => $email])-> count();
 if($checkemail == 1 ){
 return response()->json([
 'message' => 'This Email Address already exists.',
-'status' => 'fail'
+'status' => 'error'
 ]);
 }
 $token = Str::random(64);
@@ -500,7 +500,114 @@ return response()->json([
 ]);
 
 }
-}   
+
+
+
+    
+} 
+
+public function onboardingcheck(Request $request){
+ $d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){ 
+$validator = Validator::make($request->all(), [
+'email'  => 'required|email',                           
+]);  
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'fail'
+]);
+}else{
+$data = DB::table('users')
+->where(['email' => $email])
+->first();
+$language = $data -> language;
+$state = $data -> state;
+    $trade_duration = $data -> trade_duration;
+    $saves_money= $data -> saves_money;
+    $contribution_consistency = $data -> contribution_consistency;
+ $repaid_on_time = $data -> repaid_on_time;
+    $repaid_fully = $data -> repaid_fully;
+$occupation = $data -> occupation;
+
+if($occupation == NULL){
+return response()->json([
+ "success"=> true,
+  "data" => [
+    "steps_completed": "NONE",
+    "current_step": 1,
+    "onboarding_complete": false
+  ]
+
+]);
+}else if($state == NULL || $trade_duration == NULL) {
+return response()->json([
+ "success"=> true,
+  "data" => [
+    "steps_completed": [1],
+    "current_step": 2,
+    "onboarding_complete": false
+  ]
+
+]);
+}else if($saves_money == NULL || $contribution_consistency == NULL) {
+return response()->json([
+ "success"=> true,
+  "data" => [
+    "steps_completed": [1,2],
+    "current_step": 3,
+    "onboarding_complete": false
+  ]
+
+]);
+}else if($repaid_fully == NULL || $repaid_on_time == NULL) {
+return response()->json([
+ "success"=> true,
+  "data" => [
+    "steps_completed": [1,2,3],
+    "current_step": 4,
+    "onboarding_complete": false
+  ]
+
+]);
+}else if($language == NULL) {
+return response()->json([
+ "success"=> true,
+  "data" => [
+    "steps_completed": [1,2,3,4],
+    "current_step": 5,
+    "onboarding_complete": false
+  ]
+
+]);
+}else{
+return response()->json([
+ "success"=> true,
+  "data" => [
+    "steps_completed": [1,2,3,4,5],
+    "current_step": "completed",
+    "onboarding_complete": true
+  ]
+
+]);
+}
+    
+}
+    
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+    ]
+]);
+
+}
+
+}
 //stop
 
 
