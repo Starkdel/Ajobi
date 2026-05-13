@@ -19,9 +19,19 @@ class AuthController extends Controller
 public function creategroup(Request $request)
 {
 
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+
+
+
+
+}else{
 
 
 }
 
+}
+//stop
 
 }
