@@ -520,6 +520,7 @@ return response()->json([
 'status' => 'fail'
 ]);
 }else{
+    $email = $request -> email;
 $data = DB::table('users')
 ->where(['email' => $email])
 ->first();
