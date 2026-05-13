@@ -524,14 +524,14 @@ return response()->json([
 $data = DB::table('users')
 ->where(['email' => $email])
 ->first();
-$language = $data -> language;
-$state = $data -> state;
-    $trade_duration = $data -> trade_duration;
-    $saves_money= $data -> saves_money;
-    $contribution_consistency = $data -> contribution_consistency;
- $repaid_on_time = $data -> repaid_on_time;
-    $repaid_fully = $data -> repaid_fully;
-$occupation = $data -> occupation;
+$language = $data->language ?? null;
+$state = $data->state ?? null;
+$trade_duration = $data->trade_duration ?? null;
+$saves_money = $data->saves_money ?? null;
+$contribution_consistency = $data->contribution_consistency ?? null;
+$repaid_on_time = $data->repaid_on_time ?? null;
+$repaid_fully = $data->repaid_fully ?? null;
+$occupation = $data->occupation ?? null;
 
 if($occupation == NULL){
 return response()->json([
