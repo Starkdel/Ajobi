@@ -17,7 +17,9 @@ class AuthController extends Controller
 {
 //
 public function login(Request $request){
-
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
 
 $validator = Validator::make($request->all(), [
 
@@ -69,6 +71,16 @@ return response()->json([
 
 
 }
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]);
+
+}
 }
 
 
@@ -97,7 +109,9 @@ return redirect('https://ajobi.onrender.com/setup');
 
 public function register(Request $request){
 
-
+ $d_token = $request->header('Authorization');
+    $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+     if(env('REV_APP_KEY') == $accessTokennewinfo){
 $validator = Validator::make($request->all(), [
 'full_name' => 'required',
 'email' => 'required|email|unique:users',
@@ -158,6 +172,16 @@ MailController::send_mail($user_d, 'link');
 return response()->json([
 'status' => 'success',
 'message' => 'Verification email sent.'
+]);
+
+}
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
 ]);
 
 }
@@ -371,7 +395,7 @@ return response()->json([
 
 }
 
- 
+
 public function onboardingstep4(Request $request){
 $validator = Validator::make($request->all(), [
 'repaid_on_time' => 'required|boolean',
