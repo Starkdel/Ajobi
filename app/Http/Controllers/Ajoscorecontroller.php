@@ -187,6 +187,7 @@ elseif ($finalScore >= 31) {
 $tier = "Bronze";
 }
 
+
 // update database
 DB::table('users')
 ->where('email', $email)
@@ -207,6 +208,7 @@ DB::table('ajoscorecalculation')->insert([
 "account_maturity" => $account_maturity,
 
 "community_standing" => $community_standing,
+"user_id" => $user -> user_id,
 "Date" => now()
 ]);
 
@@ -257,19 +259,173 @@ return response()->json([
 ]);
 
 }
-    }else{
+}else{
 return response()->json([
 'success' => 'false',
 'error' => [
 'code' => 'UNAUTHORIZED',
 'message'=> 'Token is invalid'
-    ]
+]
 ]);
 
 }
 }
 
 
+public function getAjoreScore (Request $request, $userId) {
+
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+    
+$user = DB::table('users')
+->where('user_id', $userId)
+->first();
+
+// User not found
+if (!$user) {
+return response()->json([
+'success' => false,
+'message' => 'User not found'
+]);
+}
+
+$score = $user->ajo_score;
+ $tier = $user -> score_tier;
+if ($score >= 91) {
+$colorcode = "#6A0DAD";
+     $next = "Max_level";
+    $nexttierpoint = "max_level";
+} elseif ($score >= 76) {
+$colorcode = "#FFD700";
+    $next = "Elite";
+$nexttierpoint = 91 - $score;
+} elseif ($score >= 61) {
+     $next = "Gold";
+$colorcode = "#C0C0C0";
+    $nexttierpoint = 76- $score;
+}
+elseif ($score >= 31) {
+     $next = "Silver";
+$colorcode = "#CD7F32";
+    $nexttierpoint = 61 - $score;
+} 
+$latestdata = DB::table('ajoscorecalculation')->where('user_id', $userId)->latest()->first();
+$savings_score = $latestdata -> savings_consistency;
+
+$repayment_score = $latestdata ->repayment_behaviour;
+
+ $escrow_completion = $latestdata ->escrow_completion;
+ $transaction_history = $latestdata ->transaction_history;
+
+$account_maturity = $latestdata ->account_maturity;
+
+$community_standing = $latestdata ->community_standing;
+$count = DB::table('ajoscorecalculation')
+     ->where('user_id', $userId)
+     ->where('savings_consistency', '>', 65)
+     ->count();
+$totalcount = DB::table('ajoscorecalculation')
+     ->where('user_id', $userId)
+     ->count();
+return response()->json([
+    "success" => true,
+    "data" => [
+        "score" => $score,
+
+        "tier" => [
+            "name" => $tier,
+            "color" => $colorcode,
+            "next" => $nect,
+            "points_to_next" => $nexttierpoint
+        ],
+
+        "breakdown" => [
+            "savings_consistency" => [
+                "score" => $savings_score,
+                "weight" => 0.25,
+                "label" => "Savings Consistency",
+                "explanation" => "You have contributed on time in". $count. " of 11 cycles". $totalcount
+            ],
+            "repayment_behaviour" => [
+                "score" => $repayment_score,
+                "weight" => 0.25,
+                "label" => "Repayment Behaviour",
+                "explanation" => "No loan history yet. Take and repay a loan to improve this."
+            ],
+            "escrow_completion" => [
+                "score" => $escrow_completion,
+                "weight" => 0.20,
+                "label" => "Escrow Completion",
+                "explanation" => "All your escrows completed without dispute"
+            ],
+            "transaction_history" => [
+                "score" => $transaction_history,
+                "weight" => 0.15,
+                "label" => "Transaction History",
+                "explanation" => "Transact more through AjoBI to improve this component"
+            ],
+            "account_maturity" => [
+                "score" => $account_maturity,
+                "weight" => 0.10,
+                "label" => "Account Maturity",
+                "explanation" => "Account is 3 months old. Score grows with time."
+            ],
+            "community_standing" => [
+                "score" => $community_standing,
+                "weight" => 0.05,
+                "label" => "Community Standing",
+                "explanation" => "2 successful referrals. No disputes raised against you."
+            ]
+        ],
+
+        "features" => [
+            "unlocked" => [
+                "ajo_groups_bronze",
+                "marketplace_browse",
+                "escrow_basic",
+                "instalment_escrow"
+            ],
+
+            "locked" => [
+                [
+                    "feature" => "loans",
+                    "required_score" => 61,
+                    "current_score" => 68,
+                    "unlocked" => true,
+                    "message" => "Unlocked"
+                ],
+                [
+                    "feature" => "premium_groups",
+                    "required_score" => 76,
+                    "current_score" => 68,
+                    "unlocked" => false,
+                    "points_needed" => 8,
+                    "message" => "You need 8 more points to unlock this feature"
+                ]
+            ]
+        ],
+
+        "improvement_tips" => [
+            "Your repayment behaviour has the most room to grow. Apply for a small loan and repay on time.",
+            "Increase your transaction history by making more purchases through the marketplace."
+        ]
+    ]
+]);    
+
+    
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]);
+
+}
+}
 
 
 
