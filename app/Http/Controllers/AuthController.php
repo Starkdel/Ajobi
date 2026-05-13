@@ -229,6 +229,9 @@ return response()->json([
 
 }
 public function onboardingstep1(Request $request){
+ $d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){   
 $validator = Validator::make($request->all(), [
 'occupation' => 'required',
 'email'  => 'required|email',                           
@@ -275,11 +278,24 @@ return response()->json([
 
 
 }
+    }else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+    ]
+]);
+
+}
 
 }
 
 
 public function onboardingstep2(Request $request){
+    $d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
 $validator = Validator::make($request->all(), [
 'trade_duration' => 'required',
 'state' => 'required',
@@ -335,10 +351,22 @@ return response()->json([
 
 
 }
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+    ]
+]);
 
+}
 }
 
 public function onboardingstep3(Request $request){
+    $d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
 $validator = Validator::make($request->all(), [
 'saves_money' => 'required|boolean',
 'savings_methods' => 'required|array',
@@ -394,11 +422,23 @@ return response()->json([
 
 
 }
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+    ]
+]);
 
+}
 }
 
 
 public function onboardingstep4(Request $request){
+    $d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
 $validator = Validator::make($request->all(), [
 'repaid_on_time' => 'required|boolean',
 'repaid_fully' => 'required|boolean',
@@ -450,7 +490,16 @@ return response()->json([
 
 
 }
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+    ]
+]);
 
+}
 }   
 //stop
 
