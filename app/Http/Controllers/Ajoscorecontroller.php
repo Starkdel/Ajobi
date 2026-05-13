@@ -317,7 +317,7 @@ $next = "Silver";
 $colorcode = "#CD7F32";
 $nexttierpoint = 61 - $score;
 } 
-$latestdata = DB::table('ajoscorecalculation')->where('user_id', $userId)->orderBy('Date', 'desc')->first();->first();
+$latestdata = DB::table('ajoscorecalculation')->where('user_id', $userId)->orderBy('Date', 'desc')->first();
 $savings_score = $latestdata -> savings_consistency;
 
 $repayment_score = $latestdata ->repayment_behaviour;
