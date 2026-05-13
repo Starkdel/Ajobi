@@ -61,11 +61,16 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
     // Invite Link
     $inviteLink = "https://ajobi-643447426952.europe-west1.run.app/api/" . $inviteCode;
     //include groupid as user details
-$user = DB::table('users')
-    ->where('user_id', $request->user_id)
-    ->first();
+$user = DB::table('group_members')
+    ->insert([
+'creator_id' => $request->user_id,
+ 'group_id' => $groupId,
+ 
+             
+             ]);
 
-$groupjoined = json_decode($user->groupjoined, true) ?? [];
+
+$groupjoined = json_decode($user->groupcreatorjoined , true) ?? [];
 
 if (in_array($groupId, $groupjoined)) {
     return response()->json([
@@ -80,7 +85,7 @@ $groupjoined[] = $groupId;
 DB::table('users')
     ->where('user_id', $request->user_id)
     ->update([
-        'groupjoined' => json_encode($groupjoined)
+        'groupcreatorjoined ' => json_encode($groupjoined)
     ]);
 
     // Insert into DB
