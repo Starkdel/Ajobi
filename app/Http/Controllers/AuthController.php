@@ -52,6 +52,7 @@ return response()->json([
 'token' => $userdata -> verify_token, 
 'ajo_score' => $userdata->ajo_score,
 'score_tier' => $userdata->score_tier,
+ 'email ' => $email,                      
 'onboarding_complete' => $userdata -> onboarding_complete
 ]
 ]);
