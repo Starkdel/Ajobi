@@ -186,7 +186,7 @@ $users = DB::table('users')
  $currentMembers = count($members);
 // sum all ajo_score values
 $totalAjoScore = $users->sum('ajo_score');
-$finalajoscore =  $totalAjoScore/$currentMembers
+$finalajoscore =  $totalAjoScore/$currentMembers;
 $tier = "Bronze";
 
 if ($finalajoscore >= 91) {
