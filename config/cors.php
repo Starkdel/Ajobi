@@ -24,9 +24,14 @@ return [
     ],
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'x-xsrf-token'],
+    'allowed_headers' => [  'Content-Type',
+        'X-Requested-With',
+        'Authorization',
+        'Accept',
+        'Origin'
+    ],
 
-    'exposed_headers' => ['X-XSRF-TOKEN',  'x-xsrf-token'],
+    'exposed_headers' => [],
 
     'max_age' => 0,
 
