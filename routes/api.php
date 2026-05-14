@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Ajoscorecontroller;
 use App\Http\Controllers\GroupController;
-
+use App\Http\Controllers\MarketPlaceController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -53,9 +53,13 @@ Route::get('/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name(
 Route::post('/groups/{groupId}/join', [GroupController::class, 'joinGroup'] )->name('joinGroup');
 
 // bank statement
-Route::post('/score/{userId}', [Ajoscorecontroller::class, 'getAjoreScore'] )->name('getAjoreScore');
 Route::post('/bank-statement/upload', [BankStatementController::class, 'upload']);
 Route::get('/bank-statement/status',  [BankStatementController::class, 'status']);
+
+Route::post('/listings', [MarketPlaceController::class, 'createListing'] )->name('createListing');
+Route::get('/listings/browse', [MarketPlaceController::class, 'browseListings'] )->name('browseListings');
+Route::post('/listings/{listingId}', [MarketPlaceController::class, 'getListingDetail'] )->name('getListingDetail');
+
 
 //squad api
 
