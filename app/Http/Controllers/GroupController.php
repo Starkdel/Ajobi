@@ -431,124 +431,115 @@ return response()->json([
 }
 }
 
-
-    public function joinGroup(Request $request, $groupId)
+public function joinGroup(Request $request, $groupId)
 {
-   $d_token = $request->header('Authorization');
-$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
-if(env('REV_APP_KEY') == $accessTokennewinfo){  
-    $userId = $request->user_id; // or from auth if using sanctum
+    $d_token = $request->header('Authorization');
+    $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
 
-    $group = DB::table('groups')
-        ->where('group_id', $groupId)
-        ->first();
+    if (env('REV_APP_KEY') == $accessTokennewinfo) {
 
-    if (!$group) {
-        return response()->json([
-            "error" => [
-                "code" => "GROUP_NOT_FOUND",
-                "message" => "Group does not exist"
-            ]
-        ], 404);
-    }
+        $userId = $request->user_id;
 
-    // check invite code
-    if ($group->invite_code !== $request->invite_code) {
-        return response()->json([
-            "error" => [
-                "code" => "INVALID_INVITE",
-                "message" => "Invalid invite code"
-            ]
-        ], 400);
-    }
+        $group = DB::table('groups')
+            ->where('group_id', $groupId)
+            ->first();
 
-    // decode members
-    $members = json_decode($group->group_members, true) ?? [];
-
-    // check if already in group
-    foreach ($members as $m) {
-        if ($m['user_id'] == $userId) {
+        if (!$group) {
             return response()->json([
                 "error" => [
-                    "code" => "ALREADY_MEMBER",
-                    "message" => "You are already in this group"
+                    "code" => "GROUP_NOT_FOUND",
+                    "message" => "Group does not exist"
+                ]
+            ], 404);
+        }
+
+        if ($group->invite_code !== $request->invite_code) {
+            return response()->json([
+                "error" => [
+                    "code" => "INVALID_INVITE",
+                    "message" => "Invalid invite code"
                 ]
             ], 400);
         }
-    }
 
-    // check group full
-    if (count($members) >= $group->max_members) {
+        $members = json_decode($group->group_members, true) ?? [];
+
+        foreach ($members as $m) {
+            if ($m['user_id'] == $userId) {
+                return response()->json([
+                    "error" => [
+                        "code" => "ALREADY_MEMBER",
+                        "message" => "You are already in this group"
+                    ]
+                ], 400);
+            }
+        }
+
+        if (count($members) >= $group->max_members) {
+            return response()->json([
+                "error" => [
+                    "code" => "GROUP_FULL",
+                    "message" => "This group has reached its maximum member count"
+                ]
+            ], 400);
+        }
+
+        $user = DB::table('users')
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                "error" => [
+                    "code" => "USER_NOT_FOUND",
+                    "message" => "User not found"
+                ]
+            ], 404);
+        }
+
+        if ($user->ajo_score < $group->min_ajo_score) {
+            return response()->json([
+                "error" => [
+                    "code" => "SCORE_TOO_LOW",
+                    "message" => "Your AjoScore of {$user->ajo_score} does not meet the group minimum of {$group->min_ajo_score}"
+                ]
+            ], 400);
+        }
+
+        $rotationPosition = count($members) + 1;
+
+        $members[] = [
+            "user_id" => $userId,
+            "rotation_position" => $rotationPosition
+        ];
+
+        DB::table('groups')
+            ->where('group_id', $groupId)
+            ->update([
+                'group_members' => json_encode($members)
+            ]);
+
         return response()->json([
-            "error" => [
-                "code" => "GROUP_FULL",
-                "message" => "This group has reached its maximum member count"
+            "success" => true,
+            "data" => [
+                "joined" => true,
+                "group_id" => $groupId,
+                "rotation_position" => $rotationPosition,
+                "first_contribution_date" => $group->next_contribution_date,
+                "mandate_setup_required" => true,
+                "mandate_setup_url" => "https://squad.co/mandate/setup/{$groupId}/{$userId}"
             ]
-        ], 400);
-    }
-
-    // get user + ajo score
-    $user = DB::table('users')
-        ->where('user_id', $userId)
-        ->first();
-
-    if (!$user) {
-        return response()->json([
-            "error" => [
-                "code" => "USER_NOT_FOUND",
-                "message" => "User not found"
-            ]
-        ], 404);
-    }
-
-    // check AjoScore
-    if ($user->ajo_score < $group->min_ajo_score) {
-        return response()->json([
-            "error" => [
-                "code" => "SCORE_TOO_LOW",
-                "message" => "Your AjoScore of {$user->ajo_score} does not meet the group minimum of {$group->min_ajo_score}"
-            ]
-        ], 400);
-    }
-
-    // assign rotation position
-    $rotationPosition = count($members) + 1;
-
-    $members[] = [
-        "user_id" => $userId,
-        "rotation_position" => $rotationPosition
-    ];
-
-    // update DB
-    DB::table('groups')
-        ->where('group_id', $groupId)
-        ->update([
-            'group_members' => json_encode($members)
         ]);
 
-    return response()->json([
-        "success" => true,
-        "data" => [
-            "joined" => true,
-            "group_id" => $groupId,
-            "rotation_position" => $rotationPosition,
-
-            "first_contribution_date" => $group->next_contribution_date,
-
-            "mandate_setup_required" => true,
-            "mandate_setup_url" => "https://squad.co/mandate/setup/{$groupId}/{$userId}"
-        ]
-    ]);
-    else{
-return response()->json([
-'success' => 'false',
-'error' => [
-'code' => 'UNAUTHORIZED',
-'message'=> 'Token is invalid'
-]
-]);
-
-}
+    }else {
+        return response()->json([
+            'success' => false,
+            'error' => [
+                'code' => 'UNAUTHORIZED',
+                'message' => 'Token is invalid'
+            ]
+        ]);
+    }
 }
 //stop
 
