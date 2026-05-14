@@ -61,6 +61,9 @@ Route::get('/listings/browse', [MarketPlaceController::class, 'browseListings'] 
 Route::get('/listings/{listingId}', [MarketPlaceController::class, 'getListingDetail'] )->name('getListingDetail');
 
 
+Route::post('/groups/match', [GroupController::class, 'autoMatchGroup'] )->name('autoMatchGroup');
+
+
 //squad api
 
 // Webhook — no auth middleware, Squad sends this
