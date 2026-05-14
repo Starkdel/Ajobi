@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Ajoscorecontroller;
-
+use App\Http\Controllers\GroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +39,17 @@ Route::post('/onboarding/step2', [AuthController::class, 'onboardingstep2'] )->n
 Route::post('/onboarding/step3', [AuthController::class, 'onboardingstep3'] )->name('onboardingstep3');
 Route::post('/onboarding/step4', [AuthController::class, 'onboardingstep4'] )->name('onboardingstep4');
 Route::post('/onboarding/step5', [Ajoscorecontroller::class, 'calculateAjoScore'] )->name('calculateAjoScore');
+Route::get('/onboarding/progress/{email}', [AuthController::class, 'onboardingcheck'] )->name('onboardingcheck');
+
+Route::get('/score/{userId}', [Ajoscorecontroller::class, 'getAjoreScore'] )->name('getAjoreScore');
+Route::get('/score/{userId}/events', [Ajoscorecontroller::class, 'ajoevents'] )->name('ajoevents');
+Route::get('/score/{userId}/history', [Ajoscorecontroller::class, 'Ajohistory'] )->name('Ajohistory');
+
+//group
+Route::post('/groups', [GroupController::class, 'creategroup'] )->name('creategroup');
+Route::get('/groups/browse', [GroupController::class, 'browsegroup'] )->name('browsegroup');
+Route::get('/mygroups/{userId}', [GroupController::class, 'myGroups'] )->name('myGroups');
+Route::get('/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name('groupDetail');
 Route::post('/score/{userId}', [Ajoscorecontroller::class, 'getAjoreScore'] )->name('getAjoreScore');
 Route::post('/bank-statement/upload', [BankStatementController::class, 'upload']);
 Route::get('/bank-statement/status',  [BankStatementController::class, 'status']);

@@ -195,6 +195,13 @@ DB::table('users')
 'ajo_score' => $finalScore,
 'score_tier' => $tier
 ]);
+DB::table('ajo_score_history')
+->insert([
+'user_id' =>$user -> user_id,
+'score' => $finalScore,
+"date" => now()
+]);
+
 DB::table('ajoscorecalculation')->insert([
 'email' => $email,
 "savings_consistency" => $savings_score,
@@ -206,7 +213,7 @@ DB::table('ajoscorecalculation')->insert([
 "transaction_history" => $transaction_history,
 
 "account_maturity" => $account_maturity,
-
+"ajoscore" => $finalScore,
 "community_standing" => $community_standing,
 "user_id" => $user -> user_id,
 "Date" => now()
@@ -277,7 +284,7 @@ public function getAjoreScore (Request $request, $userId) {
 $d_token = $request->header('Authorization');
 $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
 if(env('REV_APP_KEY') == $accessTokennewinfo){
-    
+
 $user = DB::table('users')
 ->where('user_id', $userId)
 ->first();
@@ -291,129 +298,129 @@ return response()->json([
 }
 
 $score = $user->ajo_score;
- $tier = $user -> score_tier;
+$tier = $user -> score_tier;
 if ($score >= 91) {
 $colorcode = "#6A0DAD";
-     $next = "Max_level";
-    $nexttierpoint = "max_level";
+$next = "Max_level";
+$nexttierpoint = "max_level";
 } elseif ($score >= 76) {
 $colorcode = "#FFD700";
-    $next = "Elite";
+$next = "Elite";
 $nexttierpoint = 91 - $score;
 } elseif ($score >= 61) {
-     $next = "Gold";
+$next = "Gold";
 $colorcode = "#C0C0C0";
-    $nexttierpoint = 76- $score;
+$nexttierpoint = 76- $score;
 }
 elseif ($score >= 31) {
-     $next = "Silver";
+$next = "Silver";
 $colorcode = "#CD7F32";
-    $nexttierpoint = 61 - $score;
+$nexttierpoint = 61 - $score;
 } 
-$latestdata = DB::table('ajoscorecalculation')->where('user_id', $userId)->latest()->first();
+$latestdata = DB::table('ajoscorecalculation')->where('user_id', $userId)->orderBy('Date', 'desc')->first();
 $savings_score = $latestdata -> savings_consistency;
 
 $repayment_score = $latestdata ->repayment_behaviour;
 
- $escrow_completion = $latestdata ->escrow_completion;
- $transaction_history = $latestdata ->transaction_history;
+$escrow_completion = $latestdata ->escrow_completion;
+$transaction_history = $latestdata ->transaction_history;
 
 $account_maturity = $latestdata ->account_maturity;
 
 $community_standing = $latestdata ->community_standing;
 $count = DB::table('ajoscorecalculation')
-     ->where('user_id', $userId)
-     ->where('savings_consistency', '>', 65)
-     ->count();
+->where('user_id', $userId)
+->where('savings_consistency', '>', 65)
+->count();
 $totalcount = DB::table('ajoscorecalculation')
-     ->where('user_id', $userId)
-     ->count();
+->where('user_id', $userId)
+->count();
 return response()->json([
-    "success" => true,
-    "data" => [
-        "score" => $score,
+"success" => true,
+"data" => [
+"score" => $score,
 
-        "tier" => [
-            "name" => $tier,
-            "color" => $colorcode,
-            "next" => $nect,
-            "points_to_next" => $nexttierpoint
-        ],
+"tier" => [
+"name" => $tier,
+"color" => $colorcode,
+"next" => $next,
+"points_to_next" => $nexttierpoint
+],
 
-        "breakdown" => [
-            "savings_consistency" => [
-                "score" => $savings_score,
-                "weight" => 0.25,
-                "label" => "Savings Consistency",
-                "explanation" => "You have contributed on time in". $count. " of 11 cycles". $totalcount
-            ],
-            "repayment_behaviour" => [
-                "score" => $repayment_score,
-                "weight" => 0.25,
-                "label" => "Repayment Behaviour",
-                "explanation" => "No loan history yet. Take and repay a loan to improve this."
-            ],
-            "escrow_completion" => [
-                "score" => $escrow_completion,
-                "weight" => 0.20,
-                "label" => "Escrow Completion",
-                "explanation" => "All your escrows completed without dispute"
-            ],
-            "transaction_history" => [
-                "score" => $transaction_history,
-                "weight" => 0.15,
-                "label" => "Transaction History",
-                "explanation" => "Transact more through AjoBI to improve this component"
-            ],
-            "account_maturity" => [
-                "score" => $account_maturity,
-                "weight" => 0.10,
-                "label" => "Account Maturity",
-                "explanation" => "Account is 3 months old. Score grows with time."
-            ],
-            "community_standing" => [
-                "score" => $community_standing,
-                "weight" => 0.05,
-                "label" => "Community Standing",
-                "explanation" => "2 successful referrals. No disputes raised against you."
-            ]
-        ],
+"breakdown" => [
+"savings_consistency" => [
+"score" => $savings_score,
+"weight" => 0.25,
+"label" => "Savings Consistency",
+"explanation" => "You have contributed on time in". $count. " of 11 cycles". $totalcount
+],
+"repayment_behaviour" => [
+"score" => $repayment_score,
+"weight" => 0.25,
+"label" => "Repayment Behaviour",
+"explanation" => "No loan history yet. Take and repay a loan to improve this."
+],
+"escrow_completion" => [
+"score" => $escrow_completion,
+"weight" => 0.20,
+"label" => "Escrow Completion",
+"explanation" => "All your escrows completed without dispute"
+],
+"transaction_history" => [
+"score" => $transaction_history,
+"weight" => 0.15,
+"label" => "Transaction History",
+"explanation" => "Transact more through AjoBI to improve this component"
+],
+"account_maturity" => [
+"score" => $account_maturity,
+"weight" => 0.10,
+"label" => "Account Maturity",
+"explanation" => "Account is 3 months old. Score grows with time."
+],
+"community_standing" => [
+"score" => $community_standing,
+"weight" => 0.05,
+"label" => "Community Standing",
+"explanation" => "2 successful referrals. No disputes raised against you."
+]
+],
 
-        "features" => [
-            "unlocked" => [
-                "ajo_groups_bronze",
-                "marketplace_browse",
-                "escrow_basic",
-                "instalment_escrow"
-            ],
+"features" => [
+"unlocked" => [
+"ajo_groups_bronze",
+"marketplace_browse",
+"escrow_basic",
+"instalment_escrow"
+],
 
-            "locked" => [
-                [
-                    "feature" => "loans",
-                    "required_score" => 61,
-                    "current_score" => 68,
-                    "unlocked" => true,
-                    "message" => "Unlocked"
-                ],
-                [
-                    "feature" => "premium_groups",
-                    "required_score" => 76,
-                    "current_score" => 68,
-                    "unlocked" => false,
-                    "points_needed" => 8,
-                    "message" => "You need 8 more points to unlock this feature"
-                ]
-            ]
-        ],
+"locked" => [
+[
+"feature" => "loans",
+"required_score" => 61,
+"current_score" => 68,
+"unlocked" => true,
+"message" => "Unlocked"
+],
+[
+"feature" => "premium_groups",
+"required_score" => 76,
+"current_score" => 68,
+"unlocked" => false,
+"points_needed" => 8,
+"message" => "You need 8 more points to unlock this feature"
+]
+]
+],
 
-        "improvement_tips" => [
-            "Your repayment behaviour has the most room to grow. Apply for a small loan and repay on time.",
-            "Increase your transaction history by making more purchases through the marketplace."
-        ]
-    ]
+"improvement_tips" => [
+"Your repayment behaviour has the most room to grow. Apply for a small loan and repay on time.",
+"Increase your transaction history by making more purchases through the marketplace."
+]
+]
 ]);    
 
-    
+
 
 
 }else{
@@ -422,16 +429,121 @@ return response()->json([
 'error' => [
 'code' => 'UNAUTHORIZED',
 'message'=> 'Token is invalid'
+                        ]
 ]);
 
 }
 }
 
 
+public function Ajohistory($userId, Request $request){
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$days = $request->query('days', 30);
+
+$history = DB::table('ajo_score_history')
+->where('user_id', $userId)
+->where('date', '>=', now()->subDays($days))
+->orderBy('date')
+->get();
+
+return response()->json([
+    "success" => true,
+    "data" => [
+        "period_days" => (int) $days,
+        "history" => $history->map(function ($item) {
+            return [
+                "date" => $item -> date,
+                "score" => $item->score
+            ];
+        })->values()
+    ]
+]);
+
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+                        ]
+]);
+
+}
+
+
+
+}
+
+
+  public function ajoevents($userId, Request $request)
+    {
+ $d_token = $request->header('Authorization');
+    $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+     if(env('REV_APP_KEY') == $accessTokennewinfo){
+
+$limit = $request->query('limit', 20);
+$offset = $request->query('offset', 0);
+
+$events = DB::table('ajo_score_events')
+    ->where('user_id', $userId)
+    ->orderBy('created_at', 'desc')
+    ->offset($offset)
+    ->limit($limit)
+    ->get();
+
+$total = DB::table('ajo_score_events')
+    ->where('user_id', $userId)
+    ->count();
+
+return response()->json([
+    "success" => true,
+    "data" => [
+        "events" => $events->map(function ($item) {
+            return [
+                "event_id" => $item->event_id,
+                "event_type" => $item->event_type,
+                "points" => (int) $item->points,
+                "direction" => $item->direction,
+                "reason" => $item->reason,
+                "created_at" => $item->created_at, // ISO format
+            ];
+        })->values(),
+
+        "total" => $total,
+        "limit" => (int) $limit,
+        "offset" => (int) $offset
+    ]
+]);
+
+
+         
+
+         
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+                        ]
+]);
+
+}
 
 
 
 
+
+
+
+
+
+
+    }
 
 //stop
 }
