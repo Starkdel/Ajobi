@@ -578,7 +578,7 @@ public function getListingDetail(Request $request, $listingId)
                     "photo" => $seller->profile_photo ?? null,
                     "ajo_score" => $score,
                     "score_tier" => $tier,
-                    "member_since" => $seller->date ?? null,
+                    "member_since" => $seller->Date ?? null,
                     "completed_escrows" => $seller->completed_escrows ?? 0,
                     "dispute_rate" => $seller->dispute_rate ?? "0%",
                     "response_rate" => $seller->response_rate ?? "0%"
