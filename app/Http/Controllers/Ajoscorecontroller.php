@@ -227,7 +227,11 @@ DB::table('ajoscorecalculation')->insert([
 "Date" => now()
 ]);
 
-
+    DB::table('users')
+        ->where('email', $email)
+        ->update([
+            'onboarding_complete' => "true"
+        ]);
 return response()->json([
 
 "success" => true,
