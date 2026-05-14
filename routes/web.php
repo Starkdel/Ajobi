@@ -58,3 +58,6 @@ Route::get('/csrf-token', function (Request $request) {
         'session_cookie' => $request->cookie('reportwriting_session'),
     ]);
 });
+
+// squad payment callback
+Route::get('/payment/callback', [PaymentController::class, 'callback']);

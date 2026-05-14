@@ -36,6 +36,12 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'), // Your Google Client Secret
         'redirect' => env('GOOGLE_REDIRECT_URL'),      // Your Google Redirect URL
     ],
+    'squad' => [
+    'secret_key'     => env('SQUAD_SECRET_KEY'),
+    'public_key'     => env('SQUAD_PUBLIC_KEY'),
+    'base_url'       => env('SQUAD_BASE_URL', 'https://api.squadco.com'),
+    'webhook_secret' => env('SQUAD_WEBHOOK_SECRET'),
+],
     
     'gemini' => [
     'api_key' => env('GEMINI_API_KEY'),

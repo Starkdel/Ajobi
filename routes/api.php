@@ -52,10 +52,15 @@ Route::get('/mygroups/{userId}', [GroupController::class, 'myGroups'] )->name('m
 Route::get('/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name('groupDetail');
 Route::post('/groups/{groupId}/join', [GroupController::class, 'joinGroup'] )->name('joinGroup');
 
+// bank statement
 Route::post('/score/{userId}', [Ajoscorecontroller::class, 'getAjoreScore'] )->name('getAjoreScore');
 Route::post('/bank-statement/upload', [BankStatementController::class, 'upload']);
 Route::get('/bank-statement/status',  [BankStatementController::class, 'status']);
 
+//squad api
+
+// Webhook — no auth middleware, Squad sends this
+Route::post('/webhooks/squad', [WebhookController::class, 'handle']);
 
 Route::get('/auth/google/redirect', [AuthController::class, 'redirect'])->name('auth.google.redirect');
 
