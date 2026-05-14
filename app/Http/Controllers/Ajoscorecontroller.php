@@ -82,6 +82,14 @@ DB::table('users')
 ]);
 
 $imageUrl = asset($imagePath);
+}else {
+
+    // update only language
+    DB::table('users')
+        ->where('email', $email)
+        ->update([
+            'language' => $request->language
+        ]);
 }
 
 // svaings contribution
