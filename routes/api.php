@@ -50,6 +50,8 @@ Route::post('/groups', [GroupController::class, 'creategroup'] )->name('creategr
 Route::get('/groups/browse', [GroupController::class, 'browsegroup'] )->name('browsegroup');
 Route::get('/mygroups/{userId}', [GroupController::class, 'myGroups'] )->name('myGroups');
 Route::get('/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name('groupDetail');
+Route::post('/groups/{groupId}/join', [GroupController::class, 'joinGroup'] )->name('joinGroup');
+
 
 Route::get('/auth/google/redirect', [AuthController::class, 'redirect'])->name('auth.google.redirect');
 
