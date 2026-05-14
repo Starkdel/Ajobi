@@ -823,20 +823,8 @@ public function joinGroup(Request $request, $groupId)
                 )
             );
 
-            $membersWithHistory = count(
-                array_filter(
-                    $proposedMembers,
-                    function ($m) {
 
-                        return
-                            $m['groups_completed'] > 0;
-                    }
-                )
-            );
-
-            $newMembers =
-                count($proposedMembers) -
-                $membersWithHistory;
+         
 
             // FINAL RESPONSE ARRAY
             $recommendedGroups[] = [
@@ -890,11 +878,6 @@ public function joinGroup(Request $request, $groupId)
                     "average_ajo_score" =>
                         $avgScore,
 
-                    "members_with_group_history" =>
-                        $membersWithHistory,
-
-                    "members_new_to_groups" =>
-                        $newMembers,
 
                     "lowest_compatibility_in_group" =>
                         $lowestCompatibility
