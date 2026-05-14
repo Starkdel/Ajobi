@@ -187,6 +187,18 @@ $users = DB::table('users')
 // sum all ajo_score values
 $totalAjoScore = $users->sum('ajo_score');
 $finalajoscore =  $totalAjoScore/$currentMembers
+$tier = "Bronze";
+
+if ($finalajoscore >= 91) {
+$tier = "Elite";
+} elseif ($finalajoscore >= 76) {
+$tier = "Gold";
+} elseif ($finalajoscore >= 61) {
+$tier = "Silver";
+}
+elseif ($finalajoscore >= 31) {
+$tier = "Bronze";
+}
 
    
 
@@ -211,9 +223,9 @@ $finalajoscore =  $totalAjoScore/$currentMembers
             "creator_name" => $name ?? null,
             "creator_score" => $creatorname -> ajo_score ?? 0,
             "spots_remaining" => $group->max_members - $currentMembers,
-            "next_contribution_date" => now()->addDays(7)->toISOString(),
-            "tier" => "Bronze",
-            "locked" => false
+            "next_contribution_date" => $group->next_contribution_date,
+            "tier" =>$tier,
+            "locked" => $group->lockstatus,
         ];
     }
 
