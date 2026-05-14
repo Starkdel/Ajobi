@@ -200,11 +200,6 @@ elseif ($finalajoscore >= 31) {
 $tier = "Bronze";
 }
 
-   
-
-        $creator = DB::table('groups')
-            ->where('user_id', $group->creator_id)
-            ->first();
         
          $creatorname = DB::table('users')
             ->where('user_id', $group->creator_id)
