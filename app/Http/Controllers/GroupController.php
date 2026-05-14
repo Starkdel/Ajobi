@@ -38,7 +38,8 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
 
         'grace_period_hours' => 'required|in:24,48',
 
-        'description' => 'required|string'
+        'description' => 'required|string',
+    //    'joining_method' => 'required'
 
     ]);
 
@@ -54,6 +55,12 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
 
     // Generate Group ID
     $groupId = 'grp_' . uniqid();
+/*
+      if( $request -> joining_method == "automatch"){
+$inviteLink = "null";
+$inviteCode = "null";
+
+    }else if( $request -> joining_method == "manual"){
 
     // Generate Invite Code
     $inviteCode = strtoupper(substr($request->name, 0, 3)) . "-" . rand(1000,9999);
@@ -62,9 +69,16 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
     $inviteLink = "https://ajobi-643447426952.europe-west1.run.app/api/" . $inviteCode;
     //include groupid as user details
 
+    }
 
+**/
 
+   // Generate Invite Code
+    $inviteCode = strtoupper(substr($request->name, 0, 3)) . "-" . rand(1000,9999);
 
+    // Invite Link
+    $inviteLink = "https://ajobi-643447426952.europe-west1.run.app/api/" . $inviteCode;
+    //include groupid as user details
 
     // Insert into DB
     DB::table('groups')->insert([
@@ -75,9 +89,9 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
         "user_id" => $request->user_id,
         "rotation_position" => 1                              
     ]
-]),
+]),  
         'name' => $request->name,
-
+'joining_method' => $request -> joining_method,
         'contribution_amount' => $request->contribution_amount,
 
         'frequency' => $request->frequency,
@@ -100,6 +114,7 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
 
     ]);
 
+  
     return response()->json([
 
         "success" => true,
