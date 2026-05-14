@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\MailController;
 use Nette\Utils\Random;
 use Laravel\Socialite\Facades\Socialite;
-class AuthController extends Controller
+class GroupController extends Controller
 {
 
 public function creategroup(Request $request)
