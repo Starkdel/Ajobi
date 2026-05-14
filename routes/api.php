@@ -50,6 +50,8 @@ Route::post('/groups', [GroupController::class, 'creategroup'] )->name('creategr
 Route::get('/groups/browse', [GroupController::class, 'browsegroup'] )->name('browsegroup');
 Route::get('/mygroups/{userId}', [GroupController::class, 'myGroups'] )->name('myGroups');
 Route::get('/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name('groupDetail');
+Route::post('/groups/{groupId}/join', [GroupController::class, 'joinGroup'] )->name('joinGroup');
+
 Route::post('/score/{userId}', [Ajoscorecontroller::class, 'getAjoreScore'] )->name('getAjoreScore');
 Route::post('/bank-statement/upload', [BankStatementController::class, 'upload']);
 Route::get('/bank-statement/status',  [BankStatementController::class, 'status']);
