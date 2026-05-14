@@ -253,6 +253,183 @@ return response()->json([
 }
 
 }
+
+    public function myGroups($userId)
+{
+    $d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+   $groups = DB::table('groups')->get();
+
+$result = [];
+
+foreach ($groups as $group) {
+
+    $members = json_decode($group->group_members, true) ?? [];
+
+    // check if user is in group
+    $myData = null;
+
+    foreach ($members as $m) {
+        if ($m['user_id'] == $userId) {
+            $myData = $m;
+            break;
+        }
+    }
+
+    if (!$myData) {
+        continue; // skip groups user is not part of
+    }
+
+    // sort members by rotation order
+    usort($members, function ($a, $b) {
+        return $a['rotation_position'] <=> $b['rotation_position'];
+    });
+
+    // find next recipient (user_id)
+    $nextRecipient = null;
+    $foundCurrent = false;
+
+    foreach ($members as $m) {
+
+        if ($foundCurrent) {
+            $nextRecipient = $m['user_id'];
+            break;
+        }
+
+        if ($m['user_id'] == $userId) {
+            $foundCurrent = true;
+        }
+    }
+
+    // loop back if last user
+    if ($nextRecipient === null && count($members) > 0) {
+        $nextRecipient = $members[0]['user_id'];
+    }
+
+    // get next recipient name from users table
+    $nextUser = DB::table('users')
+        ->where('user_id', $nextRecipient)
+        ->first();
+
+    $nextRecipientName = $nextUser->full_name ?? null;
+
+    $result[] = [
+        "group_id" => $group->group_id,
+        "name" => $group->name,
+        "contribution_amount" => $group->contribution_amount,
+        "frequency" => $group->frequency,
+
+        "my_rotation_position" => $myData['rotation_position'],
+
+        "my_contribution_status" => "pending",
+
+        "next_contribution_date" => $group->next_contribution_date,
+
+        // FINAL OUTPUT (NAME instead of user_id)
+        "next_recipient" => $nextRecipientName,
+
+        "my_payout_date" => null,
+
+        "my_payout_amount" => $group->contribution_amount * count($members),
+
+        "current_cycle" => 1,
+
+        "total_cycles" => 10,
+
+        "direct_debit_active" => false
+    ];
+}
+
+return response()->json([
+    "success" => true,
+    "data" => [
+        "groups" => $result
+    ]
+]);
+    }else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+}
+    public function groupDetail($groupId)
+{
+    $d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+    $group = DB::table('groups')
+        ->where('group_id', $groupId)
+        ->first();
+
+    if (!$group) {
+        return response()->json([
+            "success" => false,
+            "message" => "Group not found"
+        ], 404);
+    }
+
+    $members = json_decode($group->group_members, true) ?? [];
+
+    $rotation = [];
+
+    $nextIndex = 0; // simple placeholder logic
+
+    foreach ($members as $index => $m) {
+
+        $user = DB::table('users')
+            ->where('user_id', $m['user_id'])
+            ->first();
+
+        $rotation[] = [
+            "position" => $m['rotation_position'],
+            "user_id" => $m['user_id'],
+            "name" => $user->full_name ?? null,
+            "ajo_score" => $user->ajo_score ?? 0,
+
+            "has_received" => false,
+
+            "is_next" => $index == $nextIndex
+        ];
+    }
+
+    return response()->json([
+        "success" => true,
+        "data" => [
+            "group_id" => $group->group_id,
+            "name" => $group->name,
+            "contribution_amount" => $group->contribution_amount,
+            "frequency" => $group->frequency,
+            "status" => $group->status ?? "active",
+
+            "current_cycle" => 1,
+            "total_cycles" => 10,
+
+            "next_contribution_date" => $group->next_contribution_date,
+            "next_disbursement_date" => $group->next_contribution_date,
+            "next_disbursement_amount" => $group->contribution_amount * count($members),
+
+            "rotation" => $rotation,
+
+            "this_cycle_contributions" => []
+        ]
+    ]);
+    }else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+}
 //stop
 
 }
