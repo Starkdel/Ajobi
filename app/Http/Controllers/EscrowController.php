@@ -324,7 +324,117 @@ return response()->json([
 }
 }    
 
+public function raiseDispute(Request $request, $escrowId)
+{
+    $d_token = $request->header('Authorization');
 
+    $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+
+    if (env('REV_APP_KEY') == $accessTokennewinfo) {
+
+        $validator = Validator::make($request->all(), [
+            'raised_by' => 'required',
+            'reason' => 'required',
+            'description' => 'required|string',
+            'evidence_urls' => 'nullable|array'
+        ]);
+
+        if ($validator->fails()) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ]);
+        }
+
+        // CHECK ESCROW
+        $escrow = DB::table('escrows')
+            ->where('escrow_id', $escrowId)
+            ->first();
+
+        if (!$escrow) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Escrow not found'
+            ]);
+        }
+
+        // DISPUTE ID
+        $disputeId = 'dsp_' . uniqid();
+
+        // EVIDENCE
+        $evidenceUrls = $request->evidence_urls
+            ? json_encode($request->evidence_urls)
+            : null;
+
+        // INSERT INTO DATABASE
+        DB::table('disputes')->insert([
+
+            'dispute_id' => $disputeId,
+
+            'escrow_id' => $escrowId,
+
+            'raised_by' => $request->raised_by,
+
+            'reason' => $request->reason,
+
+            'description' => $request->description,
+
+            'evidence_urls' => $evidenceUrls,
+
+            'status' => 'under_review',
+
+            'funds_held' => 1,
+
+            'ai_recommendation' => 'Partial release recommended',
+
+            'response_deadline_hours' => 48,
+
+            'created_at' => now(),
+
+            'updated_at' => now()
+        ]);
+
+        // OPTIONAL: UPDATE ESCROW STATUS
+        DB::table('escrows')
+            ->where('escrow_id', $escrowId)
+            ->update([
+                'dispute_raised' => 1,
+                'updated_at' => now()
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+
+                'dispute_id' => $disputeId,
+
+                'status' => 'under_review',
+
+                'funds_held' => true,
+
+                'ai_recommendation' =>
+                    'Partial release recommended',
+
+                'response_deadline_hours' => 48,
+
+                'message' =>
+                    'Your dispute has been received. Funds are currently held securely.'
+            ]
+        ]);
+
+    } else {
+
+        return response()->json([
+            'success' => false,
+            'error' => [
+                'code' => 'UNAUTHORIZED',
+                'message' => 'Token is invalid'
+            ]
+        ]);
+    }
+}
     
 //stop
 }
