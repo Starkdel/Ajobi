@@ -726,7 +726,7 @@ public function joinGroup(Request $request, $groupId)
 
                     ($savingsCompatibility * 0.30) +
 
-                    ($repaymentCompatibility * 0.30) +
+                    ($repaymentCompatibility * 0.30) 
 
                 
 
