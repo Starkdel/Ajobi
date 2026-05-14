@@ -48,8 +48,8 @@ Route::get('/score/{userId}/history', [Ajoscorecontroller::class, 'Ajohistory'] 
 //group
 Route::post('/groups', [GroupController::class, 'creategroup'] )->name('creategroup');
 Route::get('/groups/browse', [GroupController::class, 'browsegroup'] )->name('browsegroup');
-Route::get('/api/mygroups/{userId}', [GroupController::class, 'myGroups'] )->name('myGroups');
-Route::get('/api/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name('groupDetail');
+Route::get('/mygroups/{userId}', [GroupController::class, 'myGroups'] )->name('myGroups');
+Route::get('/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name('groupDetail');
 
 Route::get('/auth/google/redirect', [AuthController::class, 'redirect'])->name('auth.google.redirect');
 
