@@ -626,7 +626,7 @@ public function joinGroup(Request $request, $groupId)
             ->where('status', 'awaiting_members')
 
             // MUST ALLOW AUTOMATCH
-            ->where('allows_automatch', 1)
+            ->where('joining_method', 'automatch')
 
             ->get();
 
