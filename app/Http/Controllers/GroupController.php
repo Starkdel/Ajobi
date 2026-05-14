@@ -61,38 +61,21 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
     // Invite Link
     $inviteLink = "https://ajobi-643447426952.europe-west1.run.app/api/" . $inviteCode;
     //include groupid as user details
-$user = DB::table('group_members')
-    ->insert([
-'creator_id' => $request->user_id,
- 'group_id' => $groupId,
- 
-             
-             ]);
 
 
-$groupjoined = json_decode($user->groupcreatorjoined , true) ?? [];
 
-if (in_array($groupId, $groupjoined)) {
-    return response()->json([
-        "success" => false,
-        "message" => "You have already joined this group"
-    ]);
-}
 
-// add only if not exists
-$groupjoined[] = $groupId;
-
-DB::table('users')
-    ->where('user_id', $request->user_id)
-    ->update([
-        'groupcreatorjoined ' => json_encode($groupjoined)
-    ]);
 
     // Insert into DB
     DB::table('groups')->insert([
-
+        'creator_id' => $request->user_id,
         'group_id' => $groupId,
-
+         'group_members' => json_encode([
+    [
+        "user_id" => $request->user_id,
+        "rotation_position" => 1                              
+    ]
+]),
         'name' => $request->name,
 
         'contribution_amount' => $request->contribution_amount,
@@ -190,13 +173,32 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
 
     foreach ($groups as $group) {
 
-        $currentMembers = DB::table('group_members')
-            ->where('group_id', $group->group_id)
-            ->count();
+$members = json_decode($group->group_members, true) ?? [];
 
-        $creator = DB::table('users')
+// extract all user_ids
+$userIds = array_column($members, 'user_id');
+
+// get all users in one query (better than looping)
+$users = DB::table('users')
+    ->whereIn('user_id', $userIds)
+    ->get(['user_id', 'ajo_score']);
+        
+ $currentMembers = count($members);
+// sum all ajo_score values
+$totalAjoScore = $users->sum('ajo_score');
+$finalajoscore =  $totalAjoScore/$currentMembers
+
+   
+
+        $creator = DB::table('groups')
             ->where('user_id', $group->creator_id)
             ->first();
+        
+         $creatorname = DB::table('users')
+            ->where('user_id', $group->creator_id)
+            ->first();
+        
+         $name = $creatorname -> full_name;
 
         $result[] = [
             "group_id" => $group->group_id,
@@ -206,8 +208,8 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
             "current_members" => $currentMembers,
             "max_members" => $group->max_members,
             "min_ajo_score" => $group->min_ajo_score,
-            "creator_name" => $creator->name ?? null,
-            "creator_score" => $creator->ajo_score ?? 0,
+            "creator_name" => $name ?? null,
+            "creator_score" => $creatorname -> ajo_score ?? 0,
             "spots_remaining" => $group->max_members - $currentMembers,
             "next_contribution_date" => now()->addDays(7)->toISOString(),
             "tier" => "Bronze",
