@@ -19,12 +19,9 @@ return [
 
     'allowed_methods' => ['POST', 'GET'],
 
-    'allowed_origins' =>  [
-    'http://localhost:3000',
-    'https://ajobi.onrender.com',
-    'https://www.ajobi.onrender.com',
-],
-
+'allowed_origins' => [
+        'https://ajobi.onrender.com'
+    ],
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['Content-Type', 'X-Requested-With', 'x-xsrf-token'],
