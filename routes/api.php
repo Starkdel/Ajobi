@@ -58,7 +58,7 @@ Route::get('/bank-statement/status',  [BankStatementController::class, 'status']
 
 Route::post('/listings', [MarketPlaceController::class, 'createListing'] )->name('createListing');
 Route::get('/listings/browse', [MarketPlaceController::class, 'browseListings'] )->name('browseListings');
-Route::post('/listings/{listingId}', [MarketPlaceController::class, 'getListingDetail'] )->name('getListingDetail');
+Route::get('/listings/{listingId}', [MarketPlaceController::class, 'getListingDetail'] )->name('getListingDetail');
 
 
 //squad api
