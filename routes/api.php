@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Ajoscorecontroller;
-
+use App\Http\Controllers\GroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +45,9 @@ Route::get('/score/{userId}', [Ajoscorecontroller::class, 'getAjoreScore'] )->na
 Route::get('/score/{userId}/events', [Ajoscorecontroller::class, 'ajoevents'] )->name('ajoevents');
 Route::get('/score/{userId}/history', [Ajoscorecontroller::class, 'Ajohistory'] )->name('Ajohistory');
 
+//group
+Route::post('/groups', [GroupController::class, 'creategroup'] )->name('creategroup');
+Route::get('/groups/browse', [GroupController::class, 'browsegroup'] )->name('browsegroup');
 Route::get('/auth/google/redirect', [AuthController::class, 'redirect'])->name('auth.google.redirect');
 
 // Route to handle the callback from Google
