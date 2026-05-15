@@ -7,7 +7,7 @@ use App\Http\Controllers\Ajoscorecontroller;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MarketPlaceController;
 use App\Http\Controllers\EscrowController;
-
+use Illuminate\Support\Facades\Validator;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,6 +18,53 @@ use App\Http\Controllers\EscrowController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::post('/virtual-account', function (Request $request) {
+
+    // 1. VALIDATION
+    $validator = Validator::make($request->all(), [
+        'customer_identifier' => 'required|string',
+        'first_name' => 'required|string',
+        'last_name' => 'required|string',
+        'mobile_num' => 'required|string|min:10|max:15',
+        'email' => 'required|email',
+        'bvn' => 'required|string|min:11|max:11',
+        'dob' => 'required|string',
+        'address' => 'required|string',
+        'gender' => 'required|in:1,2',
+        'beneficiary_account' => 'required|string|min:10|max:10',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $validator->errors()->first()
+        ], 422);
+    }
+
+    $data = $validator->validated();
+
+    // 2. CALL SQUAD API
+    $response = Http::withHeaders([
+        'Authorization' => env('SQUAD_SECRET_KEY'),
+        'Content-Type' => 'application/json'
+    ])->post('https://api.squadco.com/virtual-account', $data);
+
+    // 3. ERROR HANDLING
+    if (!$response->successful()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Virtual account creation failed',
+            'error' => $response->json()
+        ], 500);
+    }
+
+    // 4. SUCCESS RESPONSE
+    return response()->json([
+        'success' => true,
+        'data' => $response->json()
+    ]);
+});
 Route::get('/userdata', function () {
 
     $users = DB::table('users')->get();
