@@ -41,7 +41,7 @@ Route::post('/virtual-account', function (Request $request) {
     $response = Http::withHeaders([
         'Authorization' => 'Bearer ' . env('SQUAD_SECRET_KEY'),
         'Content-Type' => 'application/json'
-    ])->post('https://sandbox-api-d.squadco.com/virtual-account', $payload);
+    ])->post('https://sandbox-api-d.squadco.com/transaction/initiate', $payload);
 
     // 4. ERROR HANDLING
     if (!$response->successful()) {
@@ -58,6 +58,67 @@ Route::post('/virtual-account', function (Request $request) {
         'data' => $response->json()
     ]);
 });
+
+
+
+
+
+
+
+
+
+
+
+Route::post('/mandate', function (Request $request) {
+
+    // 1. GET USER (NO REQUEST BODY USED)
+$payload = [
+    "mandate_type" => "emandate",
+    "amount" => "2000000",
+    "account_number" => "2473064070",
+    "bank_code" => "050",
+    "description" => "20kish pilot slive",
+    "start_date" => "2025-08-27",
+    "end_date" => "2026-01-20",
+    "customer_email" => "willia@gmail.com",
+    "transaction_reference" => "livepilot0260118",
+
+    "customerInformation" => [
+        "identity" => [
+            "type" => "bvn",
+            "number" => "22984135000"
+        ],
+
+        "firstName" => "william",
+        "lastName" => "udousoro",
+        "address" => "no 11 claytus street sabo yaba",
+        "phone" => "08132448008"
+    ]
+];
+
+    // 3. CALL SQUAD API
+    $response = Http::withHeaders([
+        'Authorization' => 'Bearer ' . env('SQUAD_SECRET_KEY'),
+        'Content-Type' => 'application/json'
+    ])->post('https://sandbox-api-d.squadco.com/transaction/mandate/create', $payload);
+
+    // 4. ERROR HANDLING
+    if (!$response->successful()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Virtual account creation failed',
+            'error' => $response->json()
+        ], 500);
+    }
+
+    // 5. SUCCESS RESPONSE
+    return response()->json([
+        'success' => true,
+        'data' => $response->json()
+    ]);
+});
+
+//
 Route::get('/userdata', function () {
 
     $users = DB::table('users')->get();
