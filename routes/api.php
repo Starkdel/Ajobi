@@ -130,9 +130,7 @@ Route::post('/webhook', function (Request $request) {
         'event' => $event
     ], 200);
 });
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Route;
+
 
 Route::post('/simulatepayment/user', function (Request $request) {
 
