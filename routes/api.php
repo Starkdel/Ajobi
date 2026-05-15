@@ -8,6 +8,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MarketPlaceController;
 use App\Http\Controllers\EscrowController;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,6 +21,115 @@ use Illuminate\Support\Facades\Validator;
 */
 
 
+
+
+Route::post('/webhook', function (Request $request) {
+
+    // 1. RAW BODY
+    $payload = $request->getContent();
+
+    // 2. SIGNATURE
+    $signature = $request->header('x-squad-encrypted-body');
+
+    // 3. VALIDATE SIGNATURE
+    $computedSignature = strtoupper(
+        hash_hmac('sha512', $payload, env('SQUAD_SECRET_KEY'))
+    );
+
+    if (!$signature || $signature !== $computedSignature) {
+
+        Storage::append(
+            'webhooks/invalid_signature.log',
+            now() . ' | Invalid Signature | ' . $payload
+        );
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Invalid signature'
+        ], 401);
+    }
+
+    // 4. DECODE DATA
+    $data = json_decode($payload, true);
+
+    $event = $data['Event'] ?? null;
+    $transactionRef = $data['TransactionRef'] ?? time();
+
+    // 5. HANDLE EVENTS SEPARATELY
+
+    /*
+    |--------------------------------------------------------------------------
+    | mandates.ready
+    |--------------------------------------------------------------------------
+    */
+
+    if ($event === 'mandates.ready') {
+
+        Storage::put(
+            'mandates/ready/' . $transactionRef . '.json',
+            json_encode($data, JSON_PRETTY_PRINT)
+        );
+
+        Storage::append(
+            'logs/mandates_ready.log',
+            now() . ' | Mandate Ready | ' . $transactionRef
+        );
+
+        // OPTIONAL:
+        // update database
+        // send notification
+        // enable debit button
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | mandates.approved
+    |--------------------------------------------------------------------------
+    */
+
+    elseif ($event === 'mandates.approved') {
+
+        Storage::put(
+            'mandates/approved/' . $transactionRef . '.json',
+            json_encode($data, JSON_PRETTY_PRINT)
+        );
+
+        Storage::append(
+            'logs/mandates_approved.log',
+            now() . ' | Mandate Approved | ' . $transactionRef
+        );
+
+        // OPTIONAL:
+        // mark user as approved
+        // activate subscription
+        // start auto debit
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UNKNOWN EVENT
+    |--------------------------------------------------------------------------
+    */
+
+    else {
+
+        Storage::put(
+            'mandates/others/' . $transactionRef . '.json',
+            json_encode($data, JSON_PRETTY_PRINT)
+        );
+
+        Storage::append(
+            'logs/unknown_events.log',
+            now() . ' | Unknown Event | ' . $event
+        );
+    }
+
+    // 6. SUCCESS RESPONSE
+    return response()->json([
+        'success' => true,
+        'event' => $event
+    ], 200);
+});
 
 Route::post('/virtual-account', function (Request $request) {
 
@@ -80,19 +190,19 @@ $payload = [
     "description" => "20kish pilot slive",
     "start_date" => "2026-05-15",
     "end_date" => "2026-07-10",
-    "customer_email" => "wjsmoejia@gmail.com",
-    "transaction_reference" => "livepilot0260118",
+    "customer_email" => "wjsmsiuahdjia@gmail.com",
+    "transaction_reference" => "livepjt0260118",
 
     "customerInformation" => [
         "identity" => [
             "type" => "bvn",
-            "number" => "22984768700"
+            "number" => "22988768700"
         ],
 
-        "firstName" => "james",
-        "lastName" => "danile",
-        "address" => "no 11 platus street sabo lagos",
-        "phone" => "08134467829"
+        "firstName" => "jamnes",
+        "lastName" => "danille",
+        "address" => "no 11 pldatus street sabo lagos",
+        "phone" => "08189467829"
     ]
 ];
 
