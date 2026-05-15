@@ -207,9 +207,9 @@ return response()->json([
 $creator = DB::table('users')->where('user_id', $escrow->creator_id)->first();
 $counterparty = DB::table('users')->where('user_id', $escrow->counterparty_id)->first();
 if ($escrow->counterparty_confirmed == true && $escrow->creator_confirmed == true){
-$bothconfirmed = true
+$bothconfirmed = true;
 }else{
-$bothconfirmed = false
+$bothconfirmed = false;
 }
 return response()->json([
 'success' => true,
@@ -274,15 +274,15 @@ return response()->json([
 $escrow = DB::table('escrows')->where('escrow_id', $escrowId)->first();
 $ecrowconterpart_confirmed =  $escrow->counterparty_confirmed;
 if ($ecrowconterpart_confirmed == true &&  $request->confirmed == true){
-$bothconfirmed = true
+$bothconfirmed = true;
 $edit_score = DB::table('users')-> where(['user_id' => $escrow->creator_id])-> first();
 $ajo_score = $edit_score -> ajo_score;
-$new_ajo_score = $ajo_score + 3
+$new_ajo_score = $ajo_score + 3;
 DB::table('users')-> where(['user_id' => $escrow->creator_id])->update([
-'ajo_score' =>  $new_ajo_score                                                    
+'ajo_score' =>  $new_ajo_score                                                 
 ]);
 }else{
-$bothconfirmed = false
+$bothconfirmed = false;
 }
 
 
