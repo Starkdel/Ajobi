@@ -130,7 +130,43 @@ Route::post('/webhook', function (Request $request) {
         'event' => $event
     ], 200);
 });
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 
+Route::post('/simulatepayment/user', function (Request $request) {
+
+    // 1. BUILD PAYLOAD
+    $payload = [
+        "virtual_account_number" => $request->id,
+        "amount" => "5000"
+    ];
+
+    // 2. CALL SQUAD API
+    $response = Http::withHeaders([
+        'Authorization' => 'Bearer ' . env('SQUAD_SECRET_KEY'),
+        'Content-Type' => 'application/json'
+    ])->post(
+        'https://sandbox-api-d.squadco.com/virtual-account/simulate/payment',
+        $payload
+    );
+
+    // 3. ERROR HANDLING
+    if (!$response->successful()) {
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Simulation failed',
+            'error' => $response->json()
+        ], 500);
+    }
+
+    // 4. SUCCESS RESPONSE
+    return response()->json([
+        'success' => true,
+        'data' => $response->json()
+    ]);
+});
 Route::post('/virtual-account', function (Request $request) {
 
     // 1. GET USER (NO REQUEST BODY USED)
