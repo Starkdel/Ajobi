@@ -78,8 +78,8 @@ $payload = [
     "account_number" => "2473064070",
     "bank_code" => "050",
     "description" => "20kish pilot slive",
-    "start_date" => "2025-08-27",
-    "end_date" => "2026-01-20",
+    "start_date" => "2026-05-15",
+    "end_date" => "2026-07-10",
     "customer_email" => "willia@gmail.com",
     "transaction_reference" => "livepilot0260118",
 
