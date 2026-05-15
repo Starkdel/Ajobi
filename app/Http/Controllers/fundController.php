@@ -68,9 +68,10 @@ $user = DB::table('users')
 $seller = DB::table('users')
 ->where('user_id', $creator_id)
 ->first();
-$email = $user -> email;
+
 
 DB::table('transaction')->insert([
+
 'buyer'=> $user -> full_name,
 'seller'=>  $seller -> full_name,
 'price' =>   $price,
@@ -87,8 +88,7 @@ DB::table('transaction')->insert([
 
   return  response()-> json([
    'status' => 'success',
-    'initiate_payment' =>  "https://ajobi-643447426952.europe-west1.run.app/api/simulatedpayment/user?id=" .
-                  ($transfer['account_number'] ?? '')
+   'virtual_account' => $seller -> virtual_account,
                             
   ]);
 }
