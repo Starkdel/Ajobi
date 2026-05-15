@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Ajoscorecontroller;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MarketPlaceController;
+use App\Http\Controllers\EscrowController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,18 +53,26 @@ Route::get('/groups/browse', [GroupController::class, 'browsegroup'] )->name('br
 Route::get('/mygroups/{userId}', [GroupController::class, 'myGroups'] )->name('myGroups');
 Route::get('/groups/{groupId}', [GroupController::class, 'groupDetail'] )->name('groupDetail');
 Route::post('/groups/{groupId}/join', [GroupController::class, 'joinGroup'] )->name('joinGroup');
+Route::post('/groups/match', [GroupController::class, 'autoMatchGroup'] )->name('autoMatchGroup');
 
 // bank statement
 Route::post('/bank-statement/upload', [BankStatementController::class, 'upload']);
 Route::get('/bank-statement/status',  [BankStatementController::class, 'status']);
 
+//marketplace
 Route::post('/listings', [MarketPlaceController::class, 'createListing'] )->name('createListing');
 Route::get('/listings/browse', [MarketPlaceController::class, 'browseListings'] )->name('browseListings');
 Route::get('/listings/{listingId}', [MarketPlaceController::class, 'getListingDetail'] )->name('getListingDetail');
 
 
-Route::post('/groups/match', [GroupController::class, 'autoMatchGroup'] )->name('autoMatchGroup');
 
+
+//escrow
+Route::post('/escrow', [EscrowController::class, 'createEscrow'] )->name('createEscrow');
+Route::get('/escrow/user/{userId}', [EscrowController::class, 'getMyEscrows'] )->name('getMyEscrows');
+Route::get('/escrow/{escrowId}', [EscrowController::class, 'getEscrowDetail'] )->name('getEscrowDetail');
+Route::post('/escrow/{escrowId}/confirm', [EscrowController::class, 'confirmEscrow'] )->name('confirmEscrow');
+Route::post('/escrow/{escrowId}/dispute', [EscrowController::class, 'raiseDispute'] )->name('raiseDispute');
 
 //squad api
 
