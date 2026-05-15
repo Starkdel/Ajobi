@@ -101,7 +101,8 @@ $inviteCode = "null";
         'min_ajo_score' => $request->min_ajo_score,
 
         'rotation_type' => $request->rotation_type,
-
+         'cycle' => '0',
+         'cycle_to_complete'=> $request->max_members,
         'grace_period_hours' => $request->grace_period_hours,
 
         'description' => $request->description,
