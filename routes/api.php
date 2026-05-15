@@ -86,13 +86,13 @@ $payload = [
     "customerInformation" => [
         "identity" => [
             "type" => "bvn",
-            "number" => "22984135000"
+            "number" => "22984768700"
         ],
 
-        "firstName" => "william",
-        "lastName" => "udousoro",
-        "address" => "no 11 claytus street sabo yaba",
-        "phone" => "08132448008"
+        "firstName" => "james",
+        "lastName" => "danile",
+        "address" => "no 11 platus street sabo lagos",
+        "phone" => "08134467829"
     ]
 ];
 
