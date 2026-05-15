@@ -57,8 +57,10 @@ public function createListing(Request $request)
             ]);
         }
 
-    
-
+    $userdetails = DB::table('users')
+->where('user_id', $request -> user_id)
+->first();
+  $account = $userdetails -> virtual_account;
         // validation on condition
         //products
         if ($request->seller_type == "product") {
@@ -208,7 +210,7 @@ public function createListing(Request $request)
         DB::table('listings')->insert([
 
             'listing_id' => $listingId,
-
+             'virtual_account' => $account,
             'user_id' => $request->user_id,
 
             'seller_type' => $request->seller_type,
