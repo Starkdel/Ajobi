@@ -185,24 +185,24 @@ Route::post('/mandate', function (Request $request) {
 $payload = [
     "mandate_type" => "emandate",
     "amount" => "2000000",
-    "account_number" => "2473064070",
+    "account_number" => "8973064070",
     "bank_code" => "050",
     "description" => "20kish pilot slive",
     "start_date" => "2026-05-15",
     "end_date" => "2026-07-10",
-    "customer_email" => "wjkohiahdjia@gmail.com",
-    "transaction_reference" => "lipjt0260118",
+    "customer_email" => "iahdjia@gmail.com",
+    "transaction_reference" => "lt02y60118",
 
     "customerInformation" => [
         "identity" => [
             "type" => "bvn",
-            "number" => "22988769700"
+            "number" => "32098769700"
         ],
 
         "firstName" => "janes",
-        "lastName" => "danle",
-        "address" => "no 11 ptydatus street sabo lagos",
-        "phone" => "08189867829"
+        "lastName" => "dakle",
+        "address" => "no 11 pbgdatus street sabo lagos",
+        "phone" => "08182367829"
     ]
 ];
 
