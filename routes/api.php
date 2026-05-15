@@ -221,16 +221,21 @@ $payload = [
         ], 500);
     }
 
-    $res =  $response->json();
-    $account = $res['data']['data']['transfer_destinations']['account_number'];
-    // 5. SUCCESS RESPONSE
+    $res = $response->json();
+
+    // ✅ correct access
+    $data = $res['data'];
+    $transfer = $data['transfer_destinations'][0] ?? null;
+
     return response()->json([
         'success' => true,
-        'data' => $response->json(),
-         'message' => $res['data']['data']['message'],    
-         'account' => $res['data']['data']['transfer_destinations']['account_number'],   
-            
-          'url' => "https://ajobi-643447426952.europe-west1.run.app/api/simulatedpayment/user?id=".$account
+        'message' => $data['message'] ?? null,
+        'mandate_id' => $data['mandate_id'] ?? null,
+
+        'account' => $transfer['account_number'] ?? null,
+
+        'url' => "https://ajobi-643447426952.europe-west1.run.app/api/simulatedpayment/user?id=" .
+                  ($transfer['account_number'] ?? '')
     ]);
 });
 
