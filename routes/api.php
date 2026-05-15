@@ -24,14 +24,6 @@ use Illuminate\Support\Facades\Validator;
 Route::post('/virtual-account', function (Request $request) {
 
     // 1. GET USER (NO REQUEST BODY USED)
-    $user = auth()->user();
-
-    if (!$user) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Unauthorized'
-        ], 401);
-    }
 
     // 2. AUTO BUILD SQUAD PAYLOAD
     $payload = [
