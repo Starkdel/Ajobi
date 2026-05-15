@@ -38,7 +38,7 @@ Route::post('/virtual-account', function (Request $request) {
         "dob" => $request -> dob,
         "address" => $request -> address,
         "gender" => $request -> gender,
-    
+        "beneficiary_account" => "4920299492",
     ];
 
     // 3. CALL SQUAD API
