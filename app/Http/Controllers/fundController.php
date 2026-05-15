@@ -87,7 +87,8 @@ DB::table('transaction')->insert([
 
   return  response()-> json([
    'status' => 'success',
-    'initiate_payment' => 
+    'initiate_payment' =>  "https://ajobi-643447426952.europe-west1.run.app/api/simulatedpayment/user?id=" .
+                  ($transfer['account_number'] ?? '')
                             
   ]);
 }
