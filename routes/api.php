@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Validator;
 Route::get('/mandate/banks', function () {
 
     $response = Http::withHeaders([
-        'Authorization' => 'Bearer sandbox_sk_94f2b798466408ef4d19e848ee1a4d1a3e93f104046f' ,
+        'Authorization' =>'Bearer ' . env('SQUAD_SECRET_KEY') ,
         'Content-Type' => 'application/json'
     ])->post('https://sandbox-api-d.squadco.com/transaction/mandate/banklists');
 
