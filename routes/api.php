@@ -19,21 +19,53 @@ use Illuminate\Support\Facades\Validator;
 |
 */
 
-Route::get('/mandate/banks', function () {
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 
+Route::post('/virtual-account', function (Request $request) {
+
+    // 1. GET USER (NO REQUEST BODY USED)
+    $user = auth()->user();
+
+    if (!$user) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Unauthorized'
+        ], 401);
+    }
+
+    // 2. AUTO BUILD SQUAD PAYLOAD
+    $payload = [
+        "customer_identifier" => $request -> id,
+        "first_name" => $request -> firstname,
+        "last_name" => $request -> lastname,
+        "mobile_num" => $request -> mobile,
+        "email" => $request -> email,
+
+    
+        "bvn" => $request -> bvn,
+        "dob" => $request -> dob,
+        "address" => $request -> address,
+        "gender" => $request -> gender,
+    
+    ];
+
+    // 3. CALL SQUAD API
     $response = Http::withHeaders([
-        'Authorization' =>'Bearer ' . env('SQUAD_SECRET_KEY') ,
+        'Authorization' => 'Bearer ' . env('SQUAD_SECRET_KEY'),
         'Content-Type' => 'application/json'
-    ])->post('https://sandbox-api-d.squadco.com/transaction/mandate/banklists');
+    ])->post('https://sandbox-api-d.squadco.com/virtual-account', $payload);
 
+    // 4. ERROR HANDLING
     if (!$response->successful()) {
         return response()->json([
             'status' => 'error',
-            'message' => 'Failed to fetch bank list',
+            'message' => 'Virtual account creation failed',
             'error' => $response->json()
         ], 500);
     }
 
+    // 5. SUCCESS RESPONSE
     return response()->json([
         'success' => true,
         'data' => $response->json()
