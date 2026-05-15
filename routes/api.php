@@ -190,19 +190,19 @@ $payload = [
     "description" => "20kish pilot slive",
     "start_date" => "2026-05-15",
     "end_date" => "2026-07-10",
-    "customer_email" => "wjsmsiuahdjia@gmail.com",
-    "transaction_reference" => "livepjt0260118",
+    "customer_email" => "wjkohiahdjia@gmail.com",
+    "transaction_reference" => "lipjt0260118",
 
     "customerInformation" => [
         "identity" => [
             "type" => "bvn",
-            "number" => "22988768700"
+            "number" => "22988769700"
         ],
 
-        "firstName" => "jamnes",
-        "lastName" => "danille",
-        "address" => "no 11 pldatus street sabo lagos",
-        "phone" => "08189467829"
+        "firstName" => "janes",
+        "lastName" => "danle",
+        "address" => "no 11 ptydatus street sabo lagos",
+        "phone" => "08189867829"
     ]
 ];
 
@@ -221,10 +221,16 @@ $payload = [
         ], 500);
     }
 
+    $res =  $response->json();
+    $account = $res['data']['data']['transfer_destinations']['account_number'];
     // 5. SUCCESS RESPONSE
     return response()->json([
         'success' => true,
-        'data' => $response->json()
+        'data' => $response->json(),
+         'message' => $res['data']['data']['message'],    
+         'account' => $res['data']['data']['transfer_destinations']['account_number'],   
+            
+          'url' => "https://ajobi-643447426952.europe-west1.run.app/api/simulatedpayment/user?id=".$account
     ]);
 });
 
