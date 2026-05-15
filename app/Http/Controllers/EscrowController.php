@@ -273,6 +273,7 @@ return response()->json([
 
 $escrow = DB::table('escrows')->where('escrow_id', $escrowId)->first();
 $ecrowconterpart_confirmed =  $escrow->counterparty_confirmed;
+    $new_ajo_score = null;
 if ($ecrowconterpart_confirmed == true &&  $request->confirmed == true){
 $bothconfirmed = true;
 $edit_score = DB::table('users')-> where(['user_id' => $escrow->creator_id])-> first();
