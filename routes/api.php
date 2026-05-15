@@ -27,18 +27,14 @@ Route::post('/virtual-account', function (Request $request) {
 
     // 2. AUTO BUILD SQUAD PAYLOAD
     $payload = [
-        "customer_identifier" => $request -> id,
-        "first_name" => $request -> firstname,
-        "last_name" => $request -> lastname,
-        "mobile_num" => $request -> mobile,
-        "email" => $request -> email,
 
-    
-        "bvn" => $request -> bvn,
-        "dob" => $request -> dob,
-        "address" => $request -> address,
-        "gender" => $request -> gender,
-        "beneficiary_account" => "4920299492",
+    "amount" => 43000,
+    "email"=>"henimastic@gmail.com",
+    "currency"=>"NGN",
+    "initiate_type"=> "inline",
+    "transaction_ref"=>"4678388588350909090AH",
+    "callback_url"=> "http://squadco.com"
+
     ];
 
     // 3. CALL SQUAD API
