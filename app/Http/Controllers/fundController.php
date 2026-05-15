@@ -58,6 +58,22 @@ return response()->json(['message' => 'Webhook stored'], 200);
 
 public function martketplace(Request $request, $listingId)
 {
+
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$validator = Validator::make($request->all(), [
+'user_id' => 'required',
+
+
+]);  
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'error'
+]);
+}else{
 $user_id = $request->user_id;
 $listingdetails = DB::table('listings')->where(['listing_id' => $listingId])-> first();
 $creator_id = $listingdetails -> user_id;
@@ -86,12 +102,132 @@ DB::table('transaction')->insert([
 
 
 
-  return  response()-> json([
-   'status' => 'success',
-   'virtual_account' => $seller -> virtual_account,
-                            
-  ]);
+return  response()-> json([
+'status' => 'success',
+'virtual_account' => $seller -> virtual_account,
+
+]);
+else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
 }
 
+public function virtual_account(Request $request) {
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$validator = Validator::make($request->all(), [
+'user_id' => 'required',
+
+]);
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'error'
+]);
+}
+$dob = \Carbon\Carbon::now()
+->subYears(rand(18, 60))
+->subDays(rand(0, 365))
+->format('m/d/Y');
+$uniqueId = uniqid('CUS', true);
+$user = DB::table('users')
+->where('user_id', $request -> user_id)
+->first();
+$payload = [
+"customer_identifier" =>  $uniqueId,
+"first_name" => $user->full_name,
+"last_name" => $user->full_name,
+"mobile_num" => $user->phone,
+"email" => $user->email,
+"bvn" => $user->bvn,
+"dob" =>$dob,
+"address" => "22 Kota street, Lagos",
+"gender" => "1",
+"beneficiary_account" => $user->beneficiary_account
+];
+// 🌐 CALL SQUAD API
+$response = Http::withHeaders([
+'Authorization' => env('SQUAD_SECRET_KEY'),
+'Content-Type' => 'application/json',
+])->post('https://sandbox-api-d.squadco.com/virtual-account', $payload );
+
+$data = $response->json();
+
+$accountNumber = $data['data']['virtual_account_number'];
+$customerid = $data['data']['customer_identifier'];
+DB::table('users')-> where('user_id', $request -> user_id)->update(['virtual_account' => $accountNumber,
+'customer_id' =>     $customerid        
+
+]);
+return response()->json([
+'status' => 'success',
+'data' => $response->json()
+]);
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+
+}
+
+
+public function kyc(Request $request) {
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$validator = Validator::make($request->all(), [
+'user_id' => 'required',
+ 'beneficiary_account' => 'required',
+ 'bvn' => 'required',
+
+]);
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'error'
+]);
+}
+$user = DB::table('users')
+->where('user_id', $request -> user_id)
+->update([
+        'bvn' => $request -> bvn,
+         'beneficiary_account' => $request -> beneficiary_account
+        ]);
+return response()->json([
+'success' => 'true',
+ 'message' => 'kyc updated'
+]);
+    
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+}
 //stop
 }
