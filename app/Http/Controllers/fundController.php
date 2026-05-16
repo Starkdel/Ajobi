@@ -347,7 +347,7 @@ $params = [
     "amount" => $details -> contribution_amount,
 ];
 
-$url = 'https://ajobi-643447426952.europe-west1.run.app/api/simulatepayment/user?' 
+$url = 'https://ajobi-643447426952.europe-west1.run.app/api/simulatepayment/group?' 
      . http_build_query($params);
 
     
@@ -479,7 +479,7 @@ $details = DB::table('escrows')->where('escrow_id', $request -> escrow_id)->firs
     "amount" => $details -> amount,
 ];
 
-$url = 'https://ajobi-643447426952.europe-west1.run.app/api/simulatepayment/user?' 
+$url = 'https://ajobi-643447426952.europe-west1.run.app/api/simulatepayment/escrow?' 
      . http_build_query($params);
 
 return response()->json([
