@@ -108,7 +108,14 @@ public function martketplace(Request $request, $listingId)
 
     $user = DB::table('users')->where('user_id', $user_id)->first();
     $seller = DB::table('users')->where('user_id', $creator_id)->first();
-
+    $ajo_score = $user-> ajo_score;
+     DB::table('users')->where('user_id', $user_id)->update([
+                  'ajo_score' =>  $ajo_score + 0.7                                  
+     ]);
+     $creatorajo_score = $seller-> ajo_score;
+     DB::table('users')->where('user_id', $creator_id)->update([
+                  'ajo_score' =>  $creatorajo_score + 0.7                                  
+     ]);
     DB::table('transaction')->insert([
         'buyer' => $user->full_name,
         'seller' => $seller->full_name,
@@ -143,6 +150,11 @@ return response()->json([
 'status' => 'error'
 ]);
 }
+  $user = DB::table('users')->where('user_id', $request ->user_id)->first();
+      $ajo_score = $user-> ajo_score;
+     DB::table('users')->where('user_id', $request ->user_id)->update([
+                  'ajo_score' =>  $ajo_score + 0.3                                  
+     ]);
 $dob = \Carbon\Carbon::now()
 ->subYears(rand(18, 60))
 ->subDays(rand(0, 365))
@@ -216,12 +228,16 @@ return response()->json([
 'status' => 'error'
 ]);
 }
+      $user = DB::table('users')->where('user_id', $request ->user_id)->first();
+      $ajo_score = $user-> ajo_score;
+
 $user = DB::table('users')
 ->where('user_id', $request -> user_id)
 ->update([
         'bvn' => $request -> bvn,
          'beneficiary_account' => $request -> beneficiary_account,
-          'account_name' => $request -> account_name
+          'account_name' => $request -> account_name,
+         'ajo_score' => $ajo_score + 0.6
         ]);
 return response()->json([
 'success' => 'true',
@@ -338,7 +354,11 @@ return response()->json([
 'status' => 'error'
 ]);
 }
-
+  $user = DB::table('users')->where('user_id', $request ->user_id)->first();
+      $ajo_score = $user-> ajo_score;
+     DB::table('users')->where('user_id', $request ->user_id)->update([
+                  'ajo_score' =>  $ajo_score + 0.3                                  
+     ]);
 $details = DB::table('groups')->where('group_id', $request -> group_id)->first();
     $account = $details-> virtual_account;
 $params = [
