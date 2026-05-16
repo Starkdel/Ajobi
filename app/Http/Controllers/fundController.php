@@ -477,6 +477,7 @@ $details = DB::table('escrows')->where('escrow_id', $request -> escrow_id)->firs
     'account_number' => $userdetails -> virtual_account,
     'user_id' => $counterparty_confirmed ,
     "amount" => $details -> amount,
+            "escrow_id" =>  $request -> escrow_id,
 ];
 
 $url = 'https://ajobi-643447426952.europe-west1.run.app/api/simulatepayment/escrow?' 
