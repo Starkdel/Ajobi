@@ -7,6 +7,7 @@ use App\Http\Controllers\Ajoscorecontroller;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MarketPlaceController;
 use App\Http\Controllers\EscrowController;
+use App\Http\Controllers\fundController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 /*
@@ -22,114 +23,7 @@ use Illuminate\Support\Facades\Storage;
 
 
 
-
-Route::post('/webhook', function (Request $request) {
-
-    // 1. RAW BODY
-    $payload = $request->getContent();
-
-    // 2. SIGNATURE
-    $signature = $request->header('x-squad-encrypted-body');
-
-    // 3. VALIDATE SIGNATURE
-    $computedSignature = strtoupper(
-        hash_hmac('sha512', $payload, env('SQUAD_SECRET_KEY'))
-    );
-
-    if (!$signature || $signature !== $computedSignature) {
-
-        Storage::append(
-            'webhooks/invalid_signature.log',
-            now() . ' | Invalid Signature | ' . $payload
-        );
-
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Invalid signature'
-        ], 401);
-    }
-
-    // 4. DECODE DATA
-    $data = json_decode($payload, true);
-
-    $event = $data['Event'] ?? null;
-    $transactionRef = $data['TransactionRef'] ?? time();
-
-    // 5. HANDLE EVENTS SEPARATELY
-
-    /*
-    |--------------------------------------------------------------------------
-    | mandates.ready
-    |--------------------------------------------------------------------------
-    */
-
-    if ($event === 'mandates.ready') {
-
-        Storage::put(
-            'mandates/ready/' . $transactionRef . '.json',
-            json_encode($data, JSON_PRETTY_PRINT)
-        );
-
-        Storage::append(
-            'logs/mandates_ready.log',
-            now() . ' | Mandate Ready | ' . $transactionRef
-        );
-
-        // OPTIONAL:
-        // update database
-        // send notification
-        // enable debit button
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | mandates.approved
-    |--------------------------------------------------------------------------
-    */
-
-    elseif ($event === 'mandates.approved') {
-
-        Storage::put(
-            'mandates/approved/' . $transactionRef . '.json',
-            json_encode($data, JSON_PRETTY_PRINT)
-        );
-
-        Storage::append(
-            'logs/mandates_approved.log',
-            now() . ' | Mandate Approved | ' . $transactionRef
-        );
-
-        // OPTIONAL:
-        // mark user as approved
-        // activate subscription
-        // start auto debit
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | UNKNOWN EVENT
-    |--------------------------------------------------------------------------
-    */
-
-    else {
-
-        Storage::put(
-            'mandates/others/' . $transactionRef . '.json',
-            json_encode($data, JSON_PRETTY_PRINT)
-        );
-
-        Storage::append(
-            'logs/unknown_events.log',
-            now() . ' | Unknown Event | ' . $event
-        );
-    }
-
-    // 6. SUCCESS RESPONSE
-    return response()->json([
-        'success' => true,
-        'event' => $event
-    ], 200);
-});
+Route::post('/webhook', [fundController::class, 'webhook'] )->name('webhook');
 
 
 Route::post('/simulatepayment/user', function (Request $request) {
