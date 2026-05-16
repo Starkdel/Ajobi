@@ -17,7 +17,7 @@ class ProfileController extends Controller
 {
 //
 
-public function getProfile($userId)
+public function getProfile(Request $request, $userId)
 {
    $d_token = $request->header('Authorization');
     $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
