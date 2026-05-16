@@ -35,7 +35,7 @@ public function getProfile(Request $request, $userId)
         "success" => true,
         "data" => [
             "user_id" => $user->id,
-            "full_name" => $user->name,
+            "full_name" => $user->full_name,
             "phone" => $user->phone,
             "email" => $user->email,
             "occupation" => $user->occupation,
