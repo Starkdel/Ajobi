@@ -269,14 +269,17 @@ $uniqueId = uniqid('CUS', true);
 $user = DB::table('groups')
 ->where('group_id', $request -> group_id)
 ->first();
+$creator_id = $user -> creator_id;
 $number = '081' . rand(10000000, 99999999);
-$group_email =   uniqid($user->name, true)."@gmail.com";
+$group_email =  DB::table('users')
+->where('user_id', $creator_id)
+->first();
 $payload = [
 "customer_identifier" =>  $uniqueId,
 "first_name" => $user->name,
 "last_name" => $user->name,
 "mobile_num" => $number,
-"email" => $group_email,
+"email" => $group_email -> email,
 "bvn" => "22343213984",
 "dob" =>$dob,
 "address" => "22 Kota street, Lagos",
@@ -397,15 +400,18 @@ $uniqueId = uniqid('CUS', true);
 $user = DB::table('escrows')
 ->where('escrow_id', $request -> escrow_id)
 ->first();
+$creator_id = $user-> creator_id;
 $escrow_name = $request -> escrow_id;
 $number = '081' . rand(10000000, 99999999);
-$getscrow_email =   uniqid($escrow_name, true)."@gmail.com";
+$escrow_email =  DB::table('users')
+->where('user_id', $creator_id)
+->first();
 $payload = [
 "customer_identifier" =>  $uniqueId,
 "first_name" => $user->name,
 "last_name" => $user->name,
 "mobile_num" => $number,
-"email" => $getscrow_email,
+"email" => $escrow_email,
 "bvn" => "29843213984",
 "dob" =>$dob,
 "address" => "22 Kota street, Lagos",
