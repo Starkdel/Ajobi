@@ -476,6 +476,7 @@ $details = DB::table('escrows')->where('escrow_id', $request -> escrow_id)->firs
     $creator_confirmed = $details-> creator_confirmed;
   $counterparty_confirmed = $details-> counterparty_confirmed;
       $counterparty_id = $details-> counterparty_id;
+    $url = null;
     if( $creator_confirmed == "true" && $counterparty_confirmed == true){
  $userdetails = DB::table('users')->where('user_id', $counterparty_id)-> first();
         $params = [
