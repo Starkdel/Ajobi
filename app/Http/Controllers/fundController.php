@@ -122,7 +122,7 @@ return  response()-> json([
 'virtual_account' => $seller -> virtual_account,
 
 ]);
-else{
+}else{
 return response()->json([
 'success' => 'false',
 'error' => [
