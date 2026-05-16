@@ -8,6 +8,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MarketPlaceController;
 use App\Http\Controllers\EscrowController;
 use App\Http\Controllers\fundController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 /*
@@ -26,12 +27,12 @@ use Illuminate\Support\Facades\Storage;
 Route::post('/webhook', [fundController::class, 'webhook'] )->name('webhook');
 
 
-Route::post('/simulatepayment/user', function (Request $request) {
+Route::post('/simulatepayment/escrow', function (Request $request) {
 
     // 1. BUILD PAYLOAD
     $payload = [
-        "virtual_account_number" => $request->id,
-        "amount" => "5000"
+        "virtual_account_number" => $request->account_number,
+        "amount" => $request->amount,
     ];
 
     // 2. CALL SQUAD API
@@ -53,44 +54,56 @@ Route::post('/simulatepayment/user', function (Request $request) {
         ], 500);
     }
 
+DB::table('escrows')->where('escrow_id', $request -> escrow_id)->update(['status' => 'completed']);
     // 4. SUCCESS RESPONSE
     return response()->json([
         'success' => true,
         'data' => $response->json()
     ]);
 });
-Route::post('/virtual-account', function (Request $request) {
 
-    // 1. GET USER (NO REQUEST BODY USED)
 
-    // 2. AUTO BUILD SQUAD PAYLOAD
+
+
+Route::post('/simulatepayment/group', function (Request $request) {
+
+    // 1. BUILD PAYLOAD
     $payload = [
-
-    "amount" => 43000,
-    "email"=>"henimastic@gmail.com",
-    "currency"=>"NGN",
-    "initiate_type"=> "inline",
-    "transaction_ref"=>"4678388588350909090AH",
-    "callback_url"=> "http://squadco.com"
-
+        "virtual_account_number" => $request->account_number,
+        "amount" => $request->amount,
     ];
 
-    // 3. CALL SQUAD API
+    // 2. CALL SQUAD API
     $response = Http::withHeaders([
         'Authorization' => 'Bearer ' . env('SQUAD_SECRET_KEY'),
         'Content-Type' => 'application/json'
-    ])->post('https://sandbox-api-d.squadco.com/transaction/initiate', $payload);
+    ])->post(
+        'https://sandbox-api-d.squadco.com/virtual-account/simulate/payment',
+        $payload
+    );
 
-    // 4. ERROR HANDLING
+    // 3. ERROR HANDLING
     if (!$response->successful()) {
+
         return response()->json([
             'status' => 'error',
-            'message' => 'Virtual account creation failed',
+            'message' => 'Simulation failed',
             'error' => $response->json()
         ], 500);
     }
 
-    // 5. SUCCESS RESPONSE
+    $group = DB::table('groups')->where('group_id', $request -> group_id)-> first();
+$members = json_decode($group->group_members, true) ?? [];
+    $userId = $request -> user_id;
+
+foreach ($members as &$member) {
+    if ($member['user_id'] == $userId) {
+        $member['cycle_number'] = ($member['cycle_number'] ?? 0) + 1;
+        break;
+    }
+}
+unset($member);
+    // 4. SUCCESS RESPONSE
     return response()->json([
         'success' => true,
         'data' => $response->json()
@@ -103,69 +116,6 @@ Route::post('/virtual-account', function (Request $request) {
 
 
 
-
-
-
-
-Route::post('/mandate', function (Request $request) {
-
-    // 1. GET USER (NO REQUEST BODY USED)
-$payload = [
-    "mandate_type" => "emandate",
-    "amount" => "2000000",
-    "account_number" => "8973064070",
-    "bank_code" => "050",
-    "description" => "20kish pilot slive",
-    "start_date" => "2026-05-15",
-    "end_date" => "2026-07-10",
-    "customer_email" => "iahdjia@gmail.com",
-    "transaction_reference" => "lt02y60118",
-
-    "customerInformation" => [
-        "identity" => [
-            "type" => "bvn",
-            "number" => "32098769700"
-        ],
-
-        "firstName" => "janes",
-        "lastName" => "dakle",
-        "address" => "no 11 pbgdatus street sabo lagos",
-        "phone" => "08182367829"
-    ]
-];
-
-    // 3. CALL SQUAD API
-    $response = Http::withHeaders([
-        'Authorization' => 'Bearer ' . env('SQUAD_SECRET_KEY'),
-        'Content-Type' => 'application/json'
-    ])->post('https://sandbox-api-d.squadco.com/transaction/mandate/create', $payload);
-
-    // 4. ERROR HANDLING
-    if (!$response->successful()) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Virtual account creation failed',
-            'error' => $response->json()
-        ], 500);
-    }
-
-    $res = $response->json();
-
-    // ✅ correct access
-    $data = $res['data'];
-    $transfer = $data['transfer_destinations'][0] ?? null;
-
-    return response()->json([
-        'success' => true,
-        'message' => $data['message'] ?? null,
-        'mandate_id' => $data['mandate_id'] ?? null,
-
-        'account' => $transfer['account_number'] ?? null,
-
-        'url' => "https://ajobi-643447426952.europe-west1.run.app/api/simulatedpayment/user?id=" .
-                  ($transfer['account_number'] ?? '')
-    ]);
-});
 
 //
 Route::get('/userdata', function () {
@@ -215,7 +165,7 @@ Route::get('/listings/browse', [MarketPlaceController::class, 'browseListings'] 
 Route::get('/listings/{listingId}', [MarketPlaceController::class, 'getListingDetail'] )->name('getListingDetail');
 
 
-
+//new
 
 //escrow
 Route::post('/escrow', [EscrowController::class, 'createEscrow'] )->name('createEscrow');
@@ -224,8 +174,19 @@ Route::get('/escrow/{escrowId}', [EscrowController::class, 'getEscrowDetail'] )-
 Route::post('/escrow/{escrowId}/confirm', [EscrowController::class, 'confirmEscrow'] )->name('confirmEscrow');
 Route::post('/escrow/{escrowId}/dispute', [EscrowController::class, 'raiseDispute'] )->name('raiseDispute');
 
+
+//fund
+Route::post('/listings/{listingId}/buy', [fundController::class, 'martketplace'] )->name('martketplace');
+Route::post('/user/virtualaccounts', [fundController::class, 'virtual_account'] )->name('virtual_account');
+Route::post('/user/kyc', [fundController::class, 'kyc'] )->name('kyc');
+Route::post('/user/groupvirtualaccounts', [fundController::class, 'group_virtual_account'] )->name('group_virtual_account');
+Route::post('/user/group_payment', [fundController::class, 'group_payment'] )->name('group_payment');
+Route::post('/user/escrowvirtualaccounts', [fundController::class, 'create_escrow_virtual_account'] )->name('create_escrow_virtual_account');
+Route::post('/user/Escrow_disbursement', [fundController::class, 'Escrow_disbursement'] )->name('Escrow_disbursement');
 //squad api
 
+//profile
+Route::get('/profile/{userId}', [ProfileController::class, 'getProfile'] )->name('getProfile');
 // Webhook — no auth middleware, Squad sends this
 Route::post('/webhooks/squad', [WebhookController::class, 'handle']);
 
