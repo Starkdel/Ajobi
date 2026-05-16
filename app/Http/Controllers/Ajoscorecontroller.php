@@ -235,7 +235,7 @@ DB::table('ajoscorecalculation')->insert([
 return response()->json([
 
 "success" => true,
-
+ "test" => $user,
 "data" => [
 
 "onboarding_complete" => true,
