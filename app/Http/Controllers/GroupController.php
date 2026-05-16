@@ -39,7 +39,7 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
         'grace_period_hours' => 'required|in:24,48',
 
         'description' => 'required|string',
-    //    'joining_method' => 'required'
+       'joining_method' => 'required'
 
     ]);
 
@@ -55,7 +55,7 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
 
     // Generate Group ID
     $groupId = 'grp_' . uniqid();
-/*
+
       if( $request -> joining_method == "automatch"){
 $inviteLink = "null";
 $inviteCode = "null";
@@ -71,7 +71,6 @@ $inviteCode = "null";
 
     }
 
-**/
 
    // Generate Invite Code
     $inviteCode = strtoupper(substr($request->name, 0, 3)) . "-" . rand(1000,9999);
