@@ -408,8 +408,8 @@ $escrow_email =  DB::table('users')
 ->first();
 $payload = [
 "customer_identifier" =>  $uniqueId,
-"first_name" => $user->name,
-"last_name" => $user->name,
+"first_name" => $escrow_name,
+"last_name" => $escrow_name,
 "mobile_num" => $number,
 "email" => $escrow_email,
 "bvn" => "29843213984",
