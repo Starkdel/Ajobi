@@ -87,7 +87,8 @@ $inviteCode = "null";
          'group_members' => json_encode([
     [
         "user_id" => $request->user_id,
-        "rotation_position" => 1                              
+        "rotation_position" => 1 ,
+          "cycle_number" => 0                              
     ]
 ]),  
         'name' => $request->name,
@@ -526,7 +527,8 @@ public function joinGroup(Request $request, $groupId)
 
         $members[] = [
             "user_id" => $userId,
-            "rotation_position" => $rotationPosition
+            "rotation_position" => $rotationPosition,
+              "cycle_number" => 0      
         ];
 
         DB::table('groups')
