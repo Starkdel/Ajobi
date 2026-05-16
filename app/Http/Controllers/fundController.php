@@ -291,12 +291,14 @@ $response = Http::withHeaders([
 
 $data = $response->json();
 
+    /**
 $accountNumber = $data['data']['virtual_account_number'];
 $customerid = $data['data']['customer_identifier'];
 DB::table('groups')->where('group_id', $request -> group_id)->update(['virtual_account' => $accountNumber,
 'customer_id' =>     $customerid        
 
 ]);
+    **/
 return response()->json([
 'status' => 'success',
 'data' => $response->json()
@@ -417,13 +419,14 @@ $response = Http::withHeaders([
 ])->post('https://sandbox-api-d.squadco.com/virtual-account', $payload );
 
 $data = $response->json();
-
+/**
 $accountNumber = $data['data']['virtual_account_number'];
 $customerid = $data['data']['customer_identifier'];
 DB::table('escrows')->where('escrow_id', $request -> escrow_id)->update(['virtual_account' => $accountNumber,
 'customer_id' =>     $customerid        
 
 ]);
+    **/
 return response()->json([
 'status' => 'success',
 'data' => $response->json()
