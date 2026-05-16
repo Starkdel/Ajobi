@@ -70,68 +70,61 @@ public function webhook(Request $request)
     ]);
 }
 
-
 public function martketplace(Request $request, $listingId)
 {
+    $d_token = $request->header('Authorization');
+    $accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
 
-$d_token = $request->header('Authorization');
-$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
-if(env('REV_APP_KEY') == $accessTokennewinfo){
-$validator = Validator::make($request->all(), [
-'user_id' => 'required',
+    if (env('REV_APP_KEY') != $accessTokennewinfo) {
+        return response()->json([
+            'success' => false,
+            'error' => [
+                'code' => 'UNAUTHORIZED',
+                'message' => 'Token is invalid'
+            ]
+        ]);
+    }
 
+    $validator = Validator::make($request->all(), [
+        'user_id' => 'required',
+    ]);
 
-]);  
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => $validator->errors()->first(),
+            'status' => 'error'
+        ]);
+    }
 
-if ($validator->fails()) {
-return response()->json([
-'message' => $validator->errors()->first(),
-'status' => 'error'
-]);
-}else{
-$user_id = $request->user_id;
-$listingdetails = DB::table('listings')->where(['listing_id' => $listingId])-> first();
-$creator_id = $listingdetails -> user_id;
-$price = $listingdetails -> price;  
-$user = DB::table('users')
-->where('user_id', $user_id)
-->first();
-$seller = DB::table('users')
-->where('user_id', $creator_id)
-->first();
+    $user_id = $request->user_id;
 
+    $listingdetails = DB::table('listings')
+        ->where('listing_id', $listingId)
+        ->first();
 
-DB::table('transaction')->insert([
+    $creator_id = $listingdetails->user_id;
+    $price = $listingdetails->price;
 
-'buyer'=> $user -> full_name,
-'seller'=>  $seller -> full_name,
-'price' =>   $price,
-'status' => 'pending',
-'type' => 'marketplace',
-'transaction_type' => 'market',
-"category"  => $listingdetails -> category,
-"title"  => $listingdetails -> title,
-'buyer_id'=> $user_id,
-'seller_id'=>  $creator_id,
-]);
+    $user = DB::table('users')->where('user_id', $user_id)->first();
+    $seller = DB::table('users')->where('user_id', $creator_id)->first();
 
+    DB::table('transaction')->insert([
+        'buyer' => $user->full_name,
+        'seller' => $seller->full_name,
+        'price' => $price,
+        'status' => 'pending',
+        'type' => 'marketplace',
+        'transaction_type' => 'market',
+        'category' => $listingdetails->category,
+        'title' => $listingdetails->title,
+        'buyer_id' => $user_id,
+        'seller_id' => $creator_id,
+    ]);
 
-
-return  response()-> json([
-'status' => 'success',
-'virtual_account' => $seller -> virtual_account,
-
-]);
-}else{
-return response()->json([
-'success' => 'false',
-'error' => [
-'code' => 'UNAUTHORIZED',
-'message'=> 'Token is invalid'
-]
-]);
-
-}
+    return response()->json([
+        'status' => 'success',
+        'virtual_account' => $seller->virtual_account,
+    ]);
 }
 
 public function virtual_account(Request $request) {
