@@ -18,41 +18,56 @@ class fundController extends Controller
 
 public function webhook(Request $request)
 {
-$payload = $request->getContent();
-$signature = $request->header('x-squad-encrypted-body');
+  // 🔐 RAW BODY
+    $rawPayload = $request->getContent();
 
-$secret = env('SQUAD_SECRET_KEY');
+    // 🔐 SECRET KEY (same as your PHP example)
+    $secretKey = env('SQUAD_SECRET_KEY');
 
-$calculatedSignature = strtoupper(hash_hmac('sha512', $payload, $secret));
+    // 🔐 GET SIGNATURE FROM HEADER
+    $expectedSignature = $request->header('x-signature'); 
+    // (change this header name if Squad uses another one)
 
-if ($signature !== $calculatedSignature) {
-return response()->json(['message' => 'Invalid signature'], 401);
-}
+    /**
+     * 🔐 GENERATE HMAC-SHA512 FROM RAW BODY
+     * IMPORTANT: must match EXACT format sent by Squad
+     */
+    $generatedSignature = hash_hmac('sha512', $rawPayload, $secretKey);
 
-$data = json_decode($payload, true);
+    // ❌ INVALID REQUEST
+    if ($generatedSignature !== $expectedSignature) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid signature'
+        ], 401);
+    }
 
-if (!$data) {
-return response()->json(['message' => 'Invalid payload'], 400);
-}
+    // ✅ PARSE JSON AFTER VERIFICATION
+    $data = json_decode($rawPayload, true);
 
-$body = $data['Body'] ?? [];
+    $event = $data['Event'] ?? null;
+    $transactionRef = $data['TransactionRef'] ?? null;
+    $body = $data['Body'] ?? [];
 
-// STORE USING DB::
-DB::table('webhook_logs')->insert([
-'event' => $data['Event'] ?? null,
-'transaction_ref' => $data['TransactionRef'] ?? null,
-'transaction_type' => $body['transaction_type'] ?? null,
-'status' => $body['transaction_status'] ?? null,
-'amount' => $body['amount'] ?? null,
-'email' => $body['email'] ?? null,
-'payload' => json_encode($data), // store full JSON
-'created_at' => now(),
-'updated_at' => now(),
-]);
+    /**
+     * 💾 STORE IN DATABASE (ALL WEBHOOK TYPES)
+     */
+    DB::table('webhook_logs')->insert([
+        'event' => $event,
+        'transaction_ref' => $transactionRef,
+        'transaction_type' => $body['transaction_type'] ?? null,
+        'status' => $body['transaction_status'] ?? null,
+        'amount' => $body['amount'] ?? null,
+        'email' => $body['email'] ?? null,
+        'payload' => json_encode($data),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
 
-
-
-return response()->json(['message' => 'Webhook stored'], 200);
+    return response()->json([
+        'success' => true,
+        'message' => 'Webhook verified and stored'
+    ]);
 }
 
 
@@ -196,7 +211,7 @@ $validator = Validator::make($request->all(), [
 'user_id' => 'required',
  'beneficiary_account' => 'required',
  'bvn' => 'required',
-
+'account_name' => 'required',
 ]);
 
 if ($validator->fails()) {
@@ -209,7 +224,8 @@ $user = DB::table('users')
 ->where('user_id', $request -> user_id)
 ->update([
         'bvn' => $request -> bvn,
-         'beneficiary_account' => $request -> beneficiary_account
+         'beneficiary_account' => $request -> beneficiary_account,
+          'account_name' => $request -> account_name
         ]);
 return response()->json([
 'success' => 'true',
@@ -228,6 +244,80 @@ return response()->json([
 ]);
 
 }
+}
+
+
+
+
+    
+public function group_virtual_account(Request $request) {
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$validator = Validator::make($request->all(), [
+'group_id' => 'required',
+
+]);
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'error'
+]);
+}
+$dob = \Carbon\Carbon::now()
+->subYears(rand(18, 60))
+->subDays(rand(0, 365))
+->format('m/d/Y');
+$uniqueId = uniqid('CUS', true);
+$user = DB::table('groups')
+->where('group_id', $request -> group_id)
+->first();
+$number = '081' . rand(10000000, 99999999);
+$group_email =   uniqid($user->name, true)."@gmail.com";
+$payload = [
+"customer_identifier" =>  $uniqueId,
+"first_name" => $user->name,
+"last_name" => $user->name,
+"mobile_num" => $number,
+"email" => $user->email,
+"bvn" => "22343213984",
+"dob" =>$dob,
+"address" => "22 Kota street, Lagos",
+"gender" => "1",
+"beneficiary_account" => "4920949492" // squad wallet (i.e no beneficiay)
+];
+// 🌐 CALL SQUAD API
+$response = Http::withHeaders([
+'Authorization' => env('SQUAD_SECRET_KEY'),
+'Content-Type' => 'application/json',
+])->post('https://sandbox-api-d.squadco.com/virtual-account', $payload );
+
+$data = $response->json();
+
+$accountNumber = $data['data']['virtual_account_number'];
+$customerid = $data['data']['customer_identifier'];
+DB::table('group')->where('group_id', $request -> group_id)->update(['virtual_account' => $accountNumber,
+'customer_id' =>     $customerid        
+
+]);
+return response()->json([
+'status' => 'success',
+'data' => $response->json()
+]);
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+
 }
 //stop
 }
