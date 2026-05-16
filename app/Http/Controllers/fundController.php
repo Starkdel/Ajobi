@@ -109,10 +109,10 @@ DB::table('transaction')->insert([
 'status' => 'pending',
 'type' => 'marketplace',
 'transaction_type' => 'market',
-"category"  => $listingdetails -> category;
-"title"  => $listingdetails -> title;
-'buyer_id'=> $user -> $user_id,
-'seller_id'=>  $seller -> $creator_id,
+"category"  => $listingdetails -> category,
+"title"  => $listingdetails -> title,
+'buyer_id'=> $user_id,
+'seller_id'=>  $creator_id,
 ]);
 
 
@@ -297,7 +297,7 @@ $data = $response->json();
 
 $accountNumber = $data['data']['virtual_account_number'];
 $customerid = $data['data']['customer_identifier'];
-DB::table('group')->where('group_id', $request -> group_id)->update(['virtual_account' => $accountNumber,
+DB::table('groups')->where('group_id', $request -> group_id)->update(['virtual_account' => $accountNumber,
 'customer_id' =>     $customerid        
 
 ]);
@@ -338,7 +338,7 @@ return response()->json([
 ]);
 }
 
-$details = DB::table('group')->where('group_id', $request -> group_id)->first();
+$details = DB::table('groups')->where('group_id', $request -> group_id)->first();
     $account = $details-> virtual_account;
 $params = [
     'account_number' => $account,
@@ -399,15 +399,15 @@ $uniqueId = uniqid('CUS', true);
 $user = DB::table('escrows')
 ->where('escrow_id', $request -> escrow_id)
 ->first();
-$escrow_name = $request -> escrow_id
+$escrow_name = $request -> escrow_id;
 $number = '081' . rand(10000000, 99999999);
-$gescrow_email =   uniqid($escrow_name, true)."@gmail.com";
+$getscrow_email =   uniqid($escrow_name, true)."@gmail.com";
 $payload = [
 "customer_identifier" =>  $uniqueId,
 "first_name" => $user->name,
 "last_name" => $user->name,
 "mobile_num" => $number,
-"email" => $gescrow_emaill,
+"email" => $getscrow_email,
 "bvn" => "29843213984",
 "dob" =>$dob,
 "address" => "22 Kota street, Lagos",
@@ -475,7 +475,7 @@ $details = DB::table('escrows')->where('escrow_id', $request -> escrow_id)->firs
  $userdetails = DB::table('users')->where('user_id', $counterparty_id)-> first();
         $params = [
     'account_number' => $userdetails -> virtual_account,
-    'user_id' => $counterparty_confirmed ,
+    'user_id' => $counterparty_id ,
     "amount" => $details -> amount,
             "escrow_id" =>  $request -> escrow_id,
 ];
