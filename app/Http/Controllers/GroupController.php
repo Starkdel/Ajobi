@@ -227,6 +227,7 @@ $tier = "Bronze";
         $result[] = [
             "group_id" => $group->group_id,
             "name" => $group->name,
+            "invitecode" => $group -> $group,
             "contribution_amount" => $group->contribution_amount,
             "frequency" => $group->frequency,
             "current_members" => $currentMembers,
@@ -333,6 +334,7 @@ foreach ($groups as $group) {
 
     $result[] = [
         "group_id" => $group->group_id,
+        "invitecode" => $group -> invite_code;
         "name" => $group->name,
         "contribution_amount" => $group->contribution_amount,
         "frequency" => $group->frequency,
@@ -419,6 +421,7 @@ if(env('REV_APP_KEY') == $accessTokennewinfo){
         "success" => true,
         "data" => [
             "group_id" => $group->group_id,
+         "invitecode" => $group->invite_code,              
             "name" => $group->name,
             "contribution_amount" => $group->contribution_amount,
             "frequency" => $group->frequency,
