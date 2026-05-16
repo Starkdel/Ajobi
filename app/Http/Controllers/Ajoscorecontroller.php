@@ -210,7 +210,7 @@ DB::table('ajo_score_history')
 "date" => now()
 ]);
 
-DB::table('ajoscorecalculation')->insert([
+$true = DB::table('ajoscorecalculation')->insert([
 'email' => $email,
 "savings_consistency" => $savings_score,
 
@@ -227,9 +227,7 @@ DB::table('ajoscorecalculation')->insert([
 "Date" => now()
 ]);
 
-    DB::table('users')
-        ->where('email', $email)
-        ->update([
+    DB::table('users')->where('email', $email)->update([
             'onboarding_complete' => "true"
         ]);
 return response()->json([
