@@ -280,7 +280,7 @@ $payload = [
 "first_name" => $user->name,
 "last_name" => $user->name,
 "mobile_num" => $number,
-"email" => $user->email,
+"email" => $group_email,
 "bvn" => "22343213984",
 "dob" =>$dob,
 "address" => "22 Kota street, Lagos",
@@ -319,5 +319,201 @@ return response()->json([
 }
 
 }
+
+
+public function group_payment(Request $request) {
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$validator = Validator::make($request->all(), [
+'user_id' => 'required',
+'group_id' => 'required',
+
+]);
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'error'
+]);
+}
+
+$details = DB::table('group')->where('group_id', $request -> group_id)->first();
+    $account = $details-> virtual_account;
+$params = [
+    'account_number' => $account,
+    'user_id' => $request -> user_id,
+    'group_id' => $request -> group_id,
+    "amount" => $details -> contribution_amount,
+];
+
+$url = 'https://ajobi-643447426952.europe-west1.run.app/api/simulatepayment/user?' 
+     . http_build_query($params);
+
+    
+return response()->json([
+'success' => 'true',
+ 'message' => "payment initiated",
+ 'url' => $url
+]);
+    
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+}
+
+
+    
+
+
+    
+public function create_escrow_virtual_account(Request $request) {
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$validator = Validator::make($request->all(), [
+'escrow_id' => 'required',
+
+]);
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'error'
+]);
+}
+$dob = \Carbon\Carbon::now()
+->subYears(rand(18, 60))
+->subDays(rand(0, 365))
+->format('m/d/Y');
+$uniqueId = uniqid('CUS', true);
+$user = DB::table('escrows')
+->where('escrow_id', $request -> escrow_id)
+->first();
+$escrow_name = $request -> escrow_id
+$number = '081' . rand(10000000, 99999999);
+$gescrow_email =   uniqid($escrow_name, true)."@gmail.com";
+$payload = [
+"customer_identifier" =>  $uniqueId,
+"first_name" => $user->name,
+"last_name" => $user->name,
+"mobile_num" => $number,
+"email" => $gescrow_emaill,
+"bvn" => "29843213984",
+"dob" =>$dob,
+"address" => "22 Kota street, Lagos",
+"gender" => "1",
+"beneficiary_account" => "2020949492" // squad wallet (i.e no beneficiay)
+];
+// 🌐 CALL SQUAD API
+$response = Http::withHeaders([
+'Authorization' => env('SQUAD_SECRET_KEY'),
+'Content-Type' => 'application/json',
+])->post('https://sandbox-api-d.squadco.com/virtual-account', $payload );
+
+$data = $response->json();
+
+$accountNumber = $data['data']['virtual_account_number'];
+$customerid = $data['data']['customer_identifier'];
+DB::table('escrows')->where('escrow_id', $request -> escrow_id)->update(['virtual_account' => $accountNumber,
+'customer_id' =>     $customerid        
+
+]);
+return response()->json([
+'status' => 'success',
+'data' => $response->json()
+]);
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+
+}
+
+
+
+     
+public function Escrow_disbursement(Request $request) {
+$d_token = $request->header('Authorization');
+$accessTokennewinfo = trim(str_replace("Bearer", "", $d_token));
+if(env('REV_APP_KEY') == $accessTokennewinfo){
+$validator = Validator::make($request->all(), [
+'escrow_id' => 'required',
+
+]);
+
+if ($validator->fails()) {
+return response()->json([
+'message' => $validator->errors()->first(),
+'status' => 'error'
+]);
+}
+
+
+$details = DB::table('escrows')->where('escrow_id', $request -> escrow_id)->first();
+    $creator_confirmed = $details-> creator_confirmed;
+  $counterparty_confirmed = $details-> counterparty_confirmed;
+      $counterparty_id = $details-> counterparty_id;
+    if( $creator_confirmed == "true" && $counterparty_confirmed == true){
+ $userdetails = DB::table('users')->where('user_id', $counterparty_id)-> first();
+        $params = [
+    'account_number' => $userdetails -> virtual_account,
+    'user_id' => $counterparty_confirmed ,
+    "amount" => $details -> amount,
+];
+
+$url = 'https://ajobi-643447426952.europe-west1.run.app/api/simulatepayment/user?' 
+     . http_build_query($params);
+
+return response()->json([
+'success' => 'true',
+ 'message' => "payment initiated",
+ 'url' => $url
+]);
+    
+
+
+    }else{
+return response()->json([
+'success' => 'false',
+ 'message' => "agreement not yet reached",
+ 'url' => $url
+]);
+    
+    }
+
+    
+
+
+
+}else{
+return response()->json([
+'success' => 'false',
+'error' => [
+'code' => 'UNAUTHORIZED',
+'message'=> 'Token is invalid'
+]
+]);
+
+}
+}
+  
 //stop
 }
