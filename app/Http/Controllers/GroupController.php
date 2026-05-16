@@ -887,7 +887,7 @@ public function joinGroup(Request $request, $groupId)
 
                     "lowest_compatibility_in_group" =>
                         $lowestCompatibility
-                ]
+                ],
             ];
         }
 
