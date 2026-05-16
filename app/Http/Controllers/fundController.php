@@ -171,12 +171,14 @@ $response = Http::withHeaders([
 
 $data = $response->json();
 
+    /**
 $accountNumber = $data['data']['virtual_account_number'];
 $customerid = $data['data']['customer_identifier'];
 DB::table('users')-> where('user_id', $request -> user_id)->update(['virtual_account' => $accountNumber,
 'customer_id' =>     $customerid        
 
 ]);
+    **/
 return response()->json([
 'status' => 'success',
 'data' => $response->json()
