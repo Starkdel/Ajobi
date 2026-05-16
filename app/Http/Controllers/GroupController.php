@@ -334,7 +334,7 @@ foreach ($groups as $group) {
 
     $result[] = [
         "group_id" => $group->group_id,
-        "invitecode" => $group -> invite_code;
+        "invitecode" => $group -> invite_code,
         "name" => $group->name,
         "contribution_amount" => $group->contribution_amount,
         "frequency" => $group->frequency,
